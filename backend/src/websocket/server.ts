@@ -88,7 +88,7 @@ export function initWebSocketServer(server: HttpServer): WebSocketServer {
             if (userIds.size === 0) {
               noteRooms.delete(noteId);
             } else {
-              broadcastToRoom(noteId, userId, {
+              broadcastToRoom(noteId, null, {
                 event: 'note:presence',
                 payload: {
                   noteId,
