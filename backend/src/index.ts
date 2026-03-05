@@ -1,13 +1,45 @@
 import 'dotenv/config';
 import express from 'express';
 import http from 'http';
+import cors from 'cors';
+import { errorHandler } from './middleware/error';
+import authRouter from './routes/auth';
+
+// Validate required env vars at startup
+const REQUIRED_ENV = [
+  'DATABASE_URL',
+  'JWT_ACCESS_SECRET',
+  'JWT_REFRESH_SECRET',
+  'JWT_ACCESS_EXPIRES_IN',
+  'JWT_REFRESH_EXPIRES_IN',
+  'CLIENT_ORIGIN',
+];
+for (const key of REQUIRED_ENV) {
+  if (!process.env[key]) {
+    console.error(`Missing required environment variable: ${key}`);
+    process.exit(1);
+  }
+}
+
+const PORT = process.env.PORT ?? 3000;
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
+
+app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
+app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
+
+// Routes
+app.use('/api/auth', authRouter);
+// app.use('/api/users', usersRouter);
+// app.use('/api/folders', foldersRouter);
+// app.use('/api/notes', notesRouter);
+
+// Global error handler — must be last
+app.use(errorHandler);
 
 const server = http.createServer(app);
 

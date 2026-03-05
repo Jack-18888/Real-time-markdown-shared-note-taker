@@ -31,9 +31,9 @@
       "name": "Express App Bootstrap & Middleware Setup",
       "phase": "foundation",
       "description": "Create the Express application entry point with all global middleware registered in the correct order. This task is complete when: (1) `backend/src/index.ts` creates an Express app and an HTTP server (using `http.createServer(app)`). (2) `express.json()` middleware is registered. (3) CORS middleware is registered using the `CLIENT_ORIGIN` env var to restrict allowed origins. (4) The app listens on the `PORT` env var, defaulting to 3000. (5) A `GET /api/health` endpoint returns `{ status: 'ok' }` with status 200 — useful for smoke testing. (6) The global error handling middleware (from `src/middleware/error.ts`) is registered last, after all routes. (7) `src/middleware/error.ts` catches any thrown error: if it is an `AppError` instance, responds with `{ error: message, code: code }` and the correct HTTP status; if it is an unknown error, responds with `{ error: 'Internal server error', code: 'INTERNAL_ERROR' }` and status 500. (8) `src/types/index.ts` exports the `AppError` class, `AuthUser` interface, `Permission` type, and the Express `Request` augmentation (adding `user?: AuthUser`). (9) `src/middleware/validate.ts` exports the `requireFields` helper as described in docs/conventions.md. (10) Server startup logs the port to console.",
-      "completed": false,
-      "completedAt": null,
-      "relatedCommit": null,
+      "completed": true,
+      "completedAt": "2026-03-05",
+      "relatedCommit": "d489c69",
       "dependsOn": ["BE-01"],
       "estimatedEffort": "small",
       "tags": ["express", "middleware", "bootstrap"]
@@ -43,8 +43,8 @@
       "name": "Auth Service & Routes",
       "phase": "auth",
       "description": "Implement the complete authentication system: register, login, token refresh, and logout. This task is complete when: (1) `src/services/auth.service.ts` contains four exported async functions: `registerUser`, `loginUser`, `refreshTokens`, `logoutUser`. No req/res objects are used inside any service function. (2) `registerUser(email, password)`: validates email format, validates password minimum 8 chars, throws AppError 409 CONFLICT if email already exists, hashes password with bcrypt cost 12, creates User in DB, signs access token (payload: { sub: userId, email }, expires JWT_ACCESS_EXPIRES_IN), signs refresh token (payload: { sub: userId }, expires JWT_REFRESH_EXPIRES_IN), stores refresh token in RefreshToken table with correct expiresAt, returns { user: { id, email }, accessToken, refreshToken }. (3) `loginUser(email, password)`: finds user by email, returns 401 UNAUTHORIZED (same message whether email not found or password wrong — no user enumeration), compares bcrypt hash, on success issues and stores tokens same as register, returns same shape. (4) `refreshTokens(refreshToken)`: verifies JWT signature with JWT_REFRESH_SECRET, throws 401 if invalid/expired, looks up token in DB throws 401 if not found, deletes old token, issues new access + refresh token pair, stores new refresh token, returns { accessToken, refreshToken }. (5) `logoutUser(refreshToken)`: deletes the RefreshToken row from DB (no error if not found — idempotent). (6) `src/controllers/auth.controller.ts` has four handler functions that parse req.body, call the service, and send the correct HTTP response codes (201 for register, 200 for login/refresh, 204 for logout). (7) `src/routes/auth.ts` mounts handlers at POST /register, POST /login, POST /refresh, POST /logout with `requireFields` validation middleware. (8) Auth routes are mounted at `/api/auth` in `src/index.ts`. (9) Password is never included in any response object.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-04",
       "relatedCommit": null,
       "dependsOn": ["BE-02", "BE-03"],
       "estimatedEffort": "medium",
@@ -273,6 +273,6 @@
     },
     "createdAt": "2026-03-04",
     "lastUpdatedAt": "2026-03-04",
-    "completedTasks": 2
+    "completedTasks": 3
   }
 }
