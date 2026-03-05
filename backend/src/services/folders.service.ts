@@ -144,3 +144,136 @@ async function collectDescendantFolderIds(parentId: string): Promise<string[]> {
 
   return ids;
 }
+
+// --- Folder Sharing ---
+
+export async function listFolderShares(userId: string, folderId: string) {
+  const folder = await prisma.folder.findUnique({ where: { id: folderId } });
+  if (!folder) {
+    throw new AppError(404, 'NOT_FOUND', 'Folder not found');
+  }
+
+  if (folder.ownerId !== userId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can view shares');
+  }
+
+  const shares = await prisma.folderShare.findMany({
+    where: { folderId },
+    select: {
+      userId: true,
+      permission: true,
+      user: { select: { email: true } },
+    },
+  });
+
+  return shares.map((s) => ({
+    userId: s.userId,
+    email: s.user.email,
+    permission: s.permission,
+  }));
+}
+
+export async function shareFolderWithUser(
+  ownerId: string,
+  folderId: string,
+  targetEmail: string,
+  permission: string
+) {
+  const folder = await prisma.folder.findUnique({ where: { id: folderId } });
+  if (!folder) {
+    throw new AppError(404, 'NOT_FOUND', 'Folder not found');
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can share this folder');
+  }
+
+  const targetUser = await prisma.user.findUnique({ where: { email: targetEmail } });
+  if (!targetUser) {
+    throw new AppError(404, 'NOT_FOUND', 'Target user not found');
+  }
+
+  if (targetUser.id === ownerId) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'Cannot share a folder with yourself');
+  }
+
+  const existing = await prisma.folderShare.findUnique({
+    where: { folderId_userId: { folderId, userId: targetUser.id } },
+  });
+  if (existing) {
+    throw new AppError(409, 'CONFLICT', 'Folder is already shared with this user');
+  }
+
+  await prisma.folderShare.create({
+    data: { folderId, userId: targetUser.id, permission },
+  });
+
+  return {
+    userId: targetUser.id,
+    email: targetUser.email,
+    permission,
+  };
+}
+
+export async function updateFolderShare(
+  ownerId: string,
+  folderId: string,
+  targetUserId: string,
+  permission: string
+) {
+  const folder = await prisma.folder.findUnique({ where: { id: folderId } });
+  if (!folder) {
+    throw new AppError(404, 'NOT_FOUND', 'Folder not found');
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can update shares');
+  }
+
+  const share = await prisma.folderShare.findUnique({
+    where: { folderId_userId: { folderId, userId: targetUserId } },
+  });
+  if (!share) {
+    throw new AppError(404, 'NOT_FOUND', 'Share not found');
+  }
+
+  const updated = await prisma.folderShare.update({
+    where: { id: share.id },
+    data: { permission },
+    select: {
+      userId: true,
+      permission: true,
+      user: { select: { email: true } },
+    },
+  });
+
+  return {
+    userId: updated.userId,
+    email: updated.user.email,
+    permission: updated.permission,
+  };
+}
+
+export async function removeFolderShare(
+  ownerId: string,
+  folderId: string,
+  targetUserId: string
+) {
+  const folder = await prisma.folder.findUnique({ where: { id: folderId } });
+  if (!folder) {
+    throw new AppError(404, 'NOT_FOUND', 'Folder not found');
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can remove shares');
+  }
+
+  const share = await prisma.folderShare.findUnique({
+    where: { folderId_userId: { folderId, userId: targetUserId } },
+  });
+  if (!share) {
+    throw new AppError(404, 'NOT_FOUND', 'Share not found');
+  }
+
+  await prisma.folderShare.delete({ where: { id: share.id } });
+}
