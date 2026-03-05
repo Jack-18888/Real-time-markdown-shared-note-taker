@@ -19,8 +19,8 @@
       "name": "Prisma Schema & Initial Migration",
       "phase": "foundation",
       "description": "Define the complete Prisma schema and run the initial migration to create the SQLite database. This task is complete when: (1) `backend/prisma/schema.prisma` defines all six models exactly as specified in docs/schema.md: User, RefreshToken, Folder, Note, NoteShare, FolderShare. (2) All relations are correctly defined (User→Notes, User→Folders, User→RefreshTokens, User→NoteShares, User→FolderShares, Folder self-relation for nesting, Folder→Notes, Note→NoteShares, Folder→FolderShares). (3) All indexes listed in docs/schema.md are present. (4) `onDelete` cascade rules match the schema doc: User deletion cascades to all owned resources; Note deletion cascades NoteShares; Folder deletion sets Note.folderId to null. (5) `npx prisma migrate dev` runs without errors and creates the SQLite DB file. (6) `npx prisma generate` runs without errors and the Prisma client is usable in TypeScript. (7) The Prisma client singleton is created at `backend/src/lib/prisma.ts` and exported as a named export `prisma`.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-05",
       "relatedCommit": null,
       "dependsOn": ["BE-01"],
       "estimatedEffort": "small",
@@ -273,6 +273,6 @@
     },
     "createdAt": "2026-03-04",
     "lastUpdatedAt": "2026-03-04",
-    "completedTasks": 1
+    "completedTasks": 2
   }
 }
