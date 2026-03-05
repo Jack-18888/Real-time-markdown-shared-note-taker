@@ -9,7 +9,7 @@
       "description": "Initialize the backend Node.js project with all required dependencies and configuration files. This task is complete when: (1) `backend/package.json` exists with all runtime dependencies (express, ws, prisma, @prisma/client, bcrypt, jsonwebtoken, dotenv, cors) and all dev dependencies (typescript, ts-node-dev, @types/* packages). (2) `backend/tsconfig.json` exists with strict mode enabled, target ES2020, module commonjs, outDir dist, rootDir src. (3) `backend/.env.example` exists listing all required env vars (DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN, PORT, CLIENT_ORIGIN) with placeholder values. (4) `backend/.gitignore` ignores node_modules, dist, .env, and the SQLite database file. (5) `npm run dev` starts the server without TypeScript errors. (6) `npm run build` compiles successfully to the dist/ folder.",
       "completed": true,
       "completedAt": "2026-03-04",
-      "relatedCommit": null,
+      "relatedCommit": "bc24a51",
       "dependsOn": [],
       "estimatedEffort": "small",
       "tags": ["setup", "config"]
