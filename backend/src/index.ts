@@ -7,6 +7,7 @@ import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import foldersRouter from './routes/folders';
 import notesRouter from './routes/notes';
+import { initWebSocketServer } from './websocket/server';
 
 // Validate required env vars at startup
 const REQUIRED_ENV = [
@@ -45,6 +46,9 @@ app.use('/api/notes', notesRouter);
 app.use(errorHandler);
 
 const server = http.createServer(app);
+
+// Initialize WebSocket server
+initWebSocketServer(server);
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
