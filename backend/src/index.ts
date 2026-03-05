@@ -4,6 +4,9 @@ import http from 'http';
 import cors from 'cors';
 import { errorHandler } from './middleware/error';
 import authRouter from './routes/auth';
+import usersRouter from './routes/users';
+import foldersRouter from './routes/folders';
+import notesRouter from './routes/notes';
 
 // Validate required env vars at startup
 const REQUIRED_ENV = [
@@ -34,9 +37,9 @@ app.get('/api/health', (_req, res) => {
 
 // Routes
 app.use('/api/auth', authRouter);
-// app.use('/api/users', usersRouter);
-// app.use('/api/folders', foldersRouter);
-// app.use('/api/notes', notesRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/folders', foldersRouter);
+app.use('/api/notes', notesRouter);
 
 // Global error handler — must be last
 app.use(errorHandler);
