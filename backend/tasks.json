@@ -57,7 +57,7 @@
       "description": "Implement the JWT authentication middleware used to protect all non-auth routes. This task is complete when: (1) `src/middleware/auth.ts` exports a default Express middleware function. (2) It reads the Authorization header, extracts the Bearer token. (3) It verifies the token using `JWT_ACCESS_SECRET`. (4) On success, it attaches `{ id: payload.sub, email: payload.email }` to `req.user` and calls `next()`. (5) If the header is missing, malformed, or the token is invalid/expired, it throws `AppError(401, 'UNAUTHORIZED', 'Invalid or missing token')`. (6) The middleware does NOT hit the database — access tokens are validated by signature only. (7) The middleware is exported and applied to all routes that require authentication (folders, notes, users).",
       "completed": true,
       "completedAt": "2026-03-04",
-      "relatedCommit": null,
+      "relatedCommit": "92591fe",
       "dependsOn": ["BE-03", "BE-04"],
       "estimatedEffort": "small",
       "tags": ["auth", "middleware", "jwt"]
