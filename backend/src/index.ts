@@ -25,33 +25,40 @@ for (const key of REQUIRED_ENV) {
   }
 }
 
-const PORT = process.env.PORT ?? 3000;
+export function createApp() {
+  const app = express();
 
-const app = express();
+  app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
+  app.use(express.json());
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
-app.use(express.json());
+  app.get('/api/health', (_req, res) => {
+    res.json({ status: 'ok' });
+  });
 
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
+  // Routes
+  app.use('/api/auth', authRouter);
+  app.use('/api/users', usersRouter);
+  app.use('/api/folders', foldersRouter);
+  app.use('/api/notes', notesRouter);
 
-// Routes
-app.use('/api/auth', authRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/folders', foldersRouter);
-app.use('/api/notes', notesRouter);
+  // Global error handler — must be last
+  app.use(errorHandler);
 
-// Global error handler — must be last
-app.use(errorHandler);
+  return app;
+}
 
-const server = http.createServer(app);
+export function createServer(app: express.Express) {
+  const server = http.createServer(app);
+  initWebSocketServer(server);
+  return server;
+}
 
-// Initialize WebSocket server
-initWebSocketServer(server);
-
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-export { app, server };
+// Start server only when run directly (not imported by tests)
+if (require.main === module) {
+  const PORT = process.env.PORT ?? 3000;
+  const app = createApp();
+  const server = createServer(app);
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

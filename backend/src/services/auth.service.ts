@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import type { StringValue } from 'ms';
 import { prisma } from '../lib/prisma';
@@ -26,13 +27,13 @@ function parseExpiry(expiresIn: string): number {
 }
 
 function signAccessToken(userId: string, email: string): string {
-  return jwt.sign({ sub: userId, email }, ACCESS_SECRET, {
+  return jwt.sign({ sub: userId, email, jti: crypto.randomUUID() }, ACCESS_SECRET, {
     expiresIn: ACCESS_EXPIRES_IN,
   });
 }
 
 function signRefreshToken(userId: string): string {
-  return jwt.sign({ sub: userId }, REFRESH_SECRET, {
+  return jwt.sign({ sub: userId, jti: crypto.randomUUID() }, REFRESH_SECRET, {
     expiresIn: REFRESH_EXPIRES_IN,
   });
 }

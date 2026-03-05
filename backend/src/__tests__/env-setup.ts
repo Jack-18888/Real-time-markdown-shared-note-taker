@@ -1,0 +1,5 @@
+// Load test environment variables before any modules are imported
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../../.env.test'), override: true });
