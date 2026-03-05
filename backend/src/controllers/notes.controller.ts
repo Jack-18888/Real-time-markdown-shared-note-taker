@@ -5,6 +5,10 @@ import {
   getNote,
   updateNote,
   deleteNote,
+  listNoteShares,
+  shareNoteWithUser,
+  updateNoteShare,
+  removeNoteShare,
 } from '../services/notes.service';
 
 export async function list(req: Request, res: Response, next: NextFunction) {
@@ -49,6 +53,60 @@ export async function update(req: Request, res: Response, next: NextFunction) {
 export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     await deleteNote(req.user!.id, req.params.id as string);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
+// --- Sharing ---
+
+export async function listShares(req: Request, res: Response, next: NextFunction) {
+  try {
+    const shares = await listNoteShares(req.user!.id, req.params.id as string);
+    res.status(200).json(shares);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createShare(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email, permission } = req.body;
+    const share = await shareNoteWithUser(
+      req.user!.id,
+      req.params.id as string,
+      email,
+      permission
+    );
+    res.status(201).json(share);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateShare(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { permission } = req.body;
+    const share = await updateNoteShare(
+      req.user!.id,
+      req.params.id as string,
+      req.params.userId as string,
+      permission
+    );
+    res.status(200).json(share);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function removeShare(req: Request, res: Response, next: NextFunction) {
+  try {
+    await removeNoteShare(
+      req.user!.id,
+      req.params.id as string,
+      req.params.userId as string
+    );
     res.status(204).send();
   } catch (err) {
     next(err);

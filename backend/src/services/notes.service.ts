@@ -191,3 +191,136 @@ export async function deleteNote(userId: string, noteId: string) {
 
   await prisma.note.delete({ where: { id: noteId } });
 }
+
+// --- Note Sharing ---
+
+export async function listNoteShares(userId: string, noteId: string) {
+  const note = await prisma.note.findUnique({ where: { id: noteId } });
+  if (!note) {
+    throw new AppError(404, 'NOT_FOUND', 'Note not found');
+  }
+
+  if (note.ownerId !== userId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can view shares');
+  }
+
+  const shares = await prisma.noteShare.findMany({
+    where: { noteId },
+    select: {
+      userId: true,
+      permission: true,
+      user: { select: { email: true } },
+    },
+  });
+
+  return shares.map((s) => ({
+    userId: s.userId,
+    email: s.user.email,
+    permission: s.permission,
+  }));
+}
+
+export async function shareNoteWithUser(
+  ownerId: string,
+  noteId: string,
+  targetEmail: string,
+  permission: string
+) {
+  const note = await prisma.note.findUnique({ where: { id: noteId } });
+  if (!note) {
+    throw new AppError(404, 'NOT_FOUND', 'Note not found');
+  }
+
+  if (note.ownerId !== ownerId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can share this note');
+  }
+
+  const targetUser = await prisma.user.findUnique({ where: { email: targetEmail } });
+  if (!targetUser) {
+    throw new AppError(404, 'NOT_FOUND', 'Target user not found');
+  }
+
+  if (targetUser.id === ownerId) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'Cannot share a note with yourself');
+  }
+
+  const existing = await prisma.noteShare.findUnique({
+    where: { noteId_userId: { noteId, userId: targetUser.id } },
+  });
+  if (existing) {
+    throw new AppError(409, 'CONFLICT', 'Note is already shared with this user');
+  }
+
+  await prisma.noteShare.create({
+    data: { noteId, userId: targetUser.id, permission },
+  });
+
+  return {
+    userId: targetUser.id,
+    email: targetUser.email,
+    permission,
+  };
+}
+
+export async function updateNoteShare(
+  ownerId: string,
+  noteId: string,
+  targetUserId: string,
+  permission: string
+) {
+  const note = await prisma.note.findUnique({ where: { id: noteId } });
+  if (!note) {
+    throw new AppError(404, 'NOT_FOUND', 'Note not found');
+  }
+
+  if (note.ownerId !== ownerId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can update shares');
+  }
+
+  const share = await prisma.noteShare.findUnique({
+    where: { noteId_userId: { noteId, userId: targetUserId } },
+  });
+  if (!share) {
+    throw new AppError(404, 'NOT_FOUND', 'Share not found');
+  }
+
+  const updated = await prisma.noteShare.update({
+    where: { id: share.id },
+    data: { permission },
+    select: {
+      userId: true,
+      permission: true,
+      user: { select: { email: true } },
+    },
+  });
+
+  return {
+    userId: updated.userId,
+    email: updated.user.email,
+    permission: updated.permission,
+  };
+}
+
+export async function removeNoteShare(
+  ownerId: string,
+  noteId: string,
+  targetUserId: string
+) {
+  const note = await prisma.note.findUnique({ where: { id: noteId } });
+  if (!note) {
+    throw new AppError(404, 'NOT_FOUND', 'Note not found');
+  }
+
+  if (note.ownerId !== ownerId) {
+    throw new AppError(403, 'FORBIDDEN', 'Only the owner can remove shares');
+  }
+
+  const share = await prisma.noteShare.findUnique({
+    where: { noteId_userId: { noteId, userId: targetUserId } },
+  });
+  if (!share) {
+    throw new AppError(404, 'NOT_FOUND', 'Share not found');
+  }
+
+  await prisma.noteShare.delete({ where: { id: share.id } });
+}
