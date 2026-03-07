@@ -235,8 +235,8 @@
       "name": "WebSocket Composable",
       "phase": "realtime",
       "description": "Implement the core WebSocket connection composable. This task is complete when: (1) `frontend/src/composables/useWebSocket.ts` exports a composable function `useWebSocket()`. (2) On call, it establishes a WebSocket connection to `ws://localhost:3000/ws?token=<accessToken>`, reading the access token from the auth store. (3) Exposes `send(event: string, payload: any)` — serializes { event, payload } as JSON and sends over the WebSocket. (4) Exposes `on(event: string, handler: (payload: any) => void)` — registers a handler for a specific event name. When a message arrives, it parses the JSON and dispatches to the matching handler by event name. (5) Exposes `off(event: string, handler)` to remove a handler. (6) Exposes a reactive `connected` ref (boolean) indicating the connection state. (7) Implements automatic reconnection on disconnect with exponential backoff (e.g. 1s, 2s, 4s, max 30s). (8) On reconnect, re-authenticates with the current access token (reads from auth store at reconnect time — token may have been refreshed). (9) Exposes a `disconnect()` function that closes the WebSocket and stops reconnection attempts. (10) Handles the case where the auth store has no token — does not attempt connection, or disconnects if token becomes null. (11) Invalid JSON messages from the server are silently ignored.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-04"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 19,
+    "completedTasks": 20,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
