@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth';
 
 type EventHandler = (payload: unknown) => void;
 
-const WS_BASE_URL = 'ws://localhost:3000/ws';
+const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:3000/ws';
 const MAX_RECONNECT_DELAY = 30000;
 
 export function useWebSocket() {

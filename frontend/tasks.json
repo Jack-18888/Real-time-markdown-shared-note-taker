@@ -307,8 +307,8 @@
       "name": "Build Verification & Final Cleanup",
       "phase": "verification",
       "description": "Final validation that the entire frontend builds, runs, and integrates with the backend correctly. This task is complete when: (1) `npm run build` in the frontend directory completes with zero TypeScript errors and zero warnings. (2) `npm run dev` starts the dev server without errors. (3) No `any` types are used anywhere in the codebase unless explicitly justified. (4) No `console.log` debug statements remain in production code. (5) All components use `<script setup lang=\"ts\">` and Composition API — no Options API usage. (6) All API calls go through the Pinia stores — no direct API calls from components. (7) All environment-specific values (API base URL, WS URL) are configurable and not hardcoded (use Vite env variables or a config file). (8) A manual walkthrough of the full user flow works end-to-end with the backend: register -> login -> create folder -> create note -> edit note with markdown preview -> share note with second user -> second user logs in and sees the shared note -> second user opens the note and sees real-time updates -> logout -> login again with restored session. (9) The frontend/tasks.json is updated with all tasks marked completed.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-07",
       "relatedCommit": null,
       "dependsOn": ["FE-23", "FE-24", "FE-25"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 25,
+    "completedTasks": 26,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
@@ -334,6 +334,6 @@
       "large": 2
     },
     "createdAt": "2026-03-06",
-    "lastUpdatedAt": "2026-03-06"
+    "lastUpdatedAt": "2026-03-07"
   }
 }
