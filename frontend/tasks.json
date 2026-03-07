@@ -211,8 +211,8 @@
       "name": "ShareModal Component",
       "phase": "sharing",
       "description": "Implement the sharing modal for notes and folders. This task is complete when: (1) `frontend/src/components/ShareModal.vue` uses `<script setup lang=\"ts\">`. (2) Props: `resourceType` ('note' | 'folder'), `resourceId` (string), `visible` (boolean). (3) Emits: `close`. (4) When opened, it fetches the current shares for the resource (calls the appropriate API: fetchNoteShares or fetchFolderShares). (5) Displays a list of current shares showing each user's email and their permission level (read/write). (6) Each share row has: a dropdown/toggle to change permission between read and write (calls updateNoteShare or updateFolderShare), a remove button to revoke access (calls deleteNoteShare or deleteFolderShare). (7) An 'Add Share' section with an email input and permission selector (read/write). On submit, calls createNoteShare or createFolderShare. Displays error messages (user not found, already shared, etc.). (8) The modal is only shown when `visible` is true and overlays the page. Clicking outside or pressing Escape closes it. (9) After any share operation (add/update/remove), the share list is refreshed. (10) Only the owner should see the share button that opens this modal — the component itself can be rendered by any caller but should display an error if the API returns 403.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-07", "FE-08", "FE-09"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 17,
+    "completedTasks": 18,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
