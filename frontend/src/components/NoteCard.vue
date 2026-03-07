@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   delete: [noteId: string];
+  share: [noteId: string];
 }>();
 
 const router = useRouter();
@@ -55,6 +56,11 @@ function handleDelete(e: Event) {
     emit('delete', props.note.id);
   }
 }
+
+function handleShare(e: Event) {
+  e.stopPropagation();
+  emit('share', props.note.id);
+}
 </script>
 
 <template>
@@ -75,14 +81,22 @@ function handleDelete(e: Event) {
         </span>
       </div>
     </div>
-    <button
-      v-if="isOwner"
-      class="note-delete"
-      title="Delete note"
-      @click="handleDelete"
-    >
-      &#10005;
-    </button>
+    <div v-if="isOwner" class="note-actions">
+      <button
+        class="note-action-btn"
+        title="Share note"
+        @click="handleShare"
+      >
+        &#128279;
+      </button>
+      <button
+        class="note-action-btn note-action-btn--danger"
+        title="Delete note"
+        @click="handleDelete"
+      >
+        &#10005;
+      </button>
+    </div>
   </div>
 </template>
 
@@ -156,7 +170,13 @@ function handleDelete(e: Event) {
   color: #888;
 }
 
-.note-delete {
+.note-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.note-action-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -165,10 +185,14 @@ function handleDelete(e: Event) {
   padding: 0.25rem;
   border-radius: 4px;
   transition: color 0.15s, background 0.15s;
-  flex-shrink: 0;
 }
 
-.note-delete:hover {
+.note-action-btn:hover {
+  color: #4a90d9;
+  background: #e8f4fd;
+}
+
+.note-action-btn--danger:hover {
   color: #d9534f;
   background: #fce4e4;
 }

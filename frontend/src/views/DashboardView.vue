@@ -6,6 +6,7 @@ import { useFoldersStore } from '@/stores/folders';
 import { useNotesStore } from '@/stores/notes';
 import FolderTree from '@/components/FolderTree.vue';
 import NoteCard from '@/components/NoteCard.vue';
+import ShareModal from '@/components/ShareModal.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -13,6 +14,9 @@ const foldersStore = useFoldersStore();
 const notesStore = useNotesStore();
 
 const selectedFolderId = ref<string | null>(null);
+const shareModalVisible = ref(false);
+const shareResourceType = ref<'note' | 'folder'>('note');
+const shareResourceId = ref('');
 
 onMounted(async () => {
   await Promise.all([foldersStore.loadFolders(), notesStore.loadNotes()]);
@@ -50,6 +54,16 @@ async function handleLogout() {
   await authStore.logout();
   router.push('/login');
 }
+
+function openShareModal(type: 'note' | 'folder', id: string) {
+  shareResourceType.value = type;
+  shareResourceId.value = id;
+  shareModalVisible.value = true;
+}
+
+function closeShareModal() {
+  shareModalVisible.value = false;
+}
 </script>
 
 <template>
@@ -66,7 +80,7 @@ async function handleLogout() {
       <aside class="sidebar">
         <FolderTree
           @select="onFolderSelect"
-          @share="() => {}"
+          @share="(folderId: string) => openShareModal('folder', folderId)"
         />
       </aside>
 
@@ -96,10 +110,18 @@ async function handleLogout() {
             :key="note.id"
             :note="note"
             @delete="handleDeleteNote"
+            @share="(noteId: string) => openShareModal('note', noteId)"
           />
         </div>
       </main>
     </div>
+
+    <ShareModal
+      :resource-type="shareResourceType"
+      :resource-id="shareResourceId"
+      :visible="shareModalVisible"
+      @close="closeShareModal"
+    />
   </div>
 </template>
 

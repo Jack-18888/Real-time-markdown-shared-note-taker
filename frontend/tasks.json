@@ -223,8 +223,8 @@
       "name": "Integrate Sharing into Dashboard & NoteView",
       "phase": "sharing",
       "description": "Wire the ShareModal into the dashboard and note view so users can manage sharing. This task is complete when: (1) In DashboardView, each note card owned by the current user has a 'Share' button that opens the ShareModal with resourceType='note'. (2) In the FolderTree, each folder owned by the current user has a 'Share' action that opens the ShareModal with resourceType='folder'. (3) In NoteView, if the user is the owner, a 'Share' button in the header/toolbar opens the ShareModal. (4) The ShareModal is rendered once in each parent view (not duplicated per item) and reused by passing different resourceId props. (5) After sharing or unsharing, relevant store data is refreshed if needed (e.g. if permissions change affect the current view).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-14", "FE-17", "FE-18"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 18,
+    "completedTasks": 19,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],

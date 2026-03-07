@@ -2,19 +2,27 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNotesStore } from '@/stores/notes';
+import { useAuthStore } from '@/stores/auth';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import ShareModal from '@/components/ShareModal.vue';
 
 const route = useRoute();
 const router = useRouter();
 const notesStore = useNotesStore();
+const authStore = useAuthStore();
 
 const noteId = computed(() => route.params.id as string);
 const editingTitle = ref(false);
 const titleInput = ref('');
 const localContent = ref('');
+const shareModalVisible = ref(false);
 
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const isOwner = computed(
+  () => notesStore.currentNote?.ownerId === authStore.user?.id
+);
 
 const permission = computed(
   () => notesStore.currentNote?.permission ?? 'read'
@@ -129,6 +137,13 @@ function goBack() {
       </div>
 
       <div class="note-header-meta">
+        <button
+          v-if="isOwner"
+          class="btn-share"
+          @click="shareModalVisible = true"
+        >
+          Share
+        </button>
         <span
           class="permission-badge"
           :class="{
@@ -167,6 +182,14 @@ function goBack() {
     <div v-if="isReadonly && notesStore.currentNote" class="readonly-banner">
       This note is read-only. You cannot edit it.
     </div>
+
+    <ShareModal
+      v-if="notesStore.currentNote"
+      resource-type="note"
+      :resource-id="noteId"
+      :visible="shareModalVisible"
+      @close="shareModalVisible = false"
+    />
   </div>
 </template>
 
@@ -242,6 +265,21 @@ function goBack() {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+}
+
+.btn-share {
+  padding: 0.25rem 0.6rem;
+  background: #fff;
+  color: #4a90d9;
+  border: 1px solid #4a90d9;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-share:hover {
+  background: #e8f4fd;
 }
 
 .permission-badge {
