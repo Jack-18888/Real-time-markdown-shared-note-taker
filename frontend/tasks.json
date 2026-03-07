@@ -55,8 +55,8 @@
       "name": "Vue Router with Auth Guards",
       "phase": "auth",
       "description": "Set up Vue Router with all route definitions and navigation guards for authentication. This task is complete when: (1) `frontend/src/router/index.ts` exports a Vue Router instance using `createRouter` with `createWebHistory`. (2) Routes defined: `/login` -> LoginView (meta: { guest: true }), `/register` -> RegisterView (meta: { guest: true }), `/` -> DashboardView (meta: { requiresAuth: true }), `/notes/:id` -> NoteView (meta: { requiresAuth: true }). (3) A global `beforeEach` navigation guard checks: if the route requires auth (`meta.requiresAuth`) and the user is not authenticated (via auth store), redirect to `/login`; if the route is guest-only (`meta.guest`) and the user is authenticated, redirect to `/`. (4) The router is registered in `main.ts` via `app.use(router)`. (5) Navigating to an unknown route redirects to `/` (or shows a 404 page). (6) The `NoteView` route uses a dynamic param `:id` that is accessible via `useRoute().params.id`.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-04"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 4,
+    "completedTasks": 5,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
