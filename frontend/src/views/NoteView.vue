@@ -222,7 +222,10 @@ function goBack() {
       WebSocket: {{ wsError.message }}
     </div>
 
-    <div v-if="notesStore.loading" class="loading">Loading note...</div>
+    <div v-if="notesStore.loading" class="loading">
+      <span class="spinner"></span>
+      <span>Loading note...</span>
+    </div>
 
     <div v-else-if="notesStore.error" class="error-state">
       <p>{{ notesStore.error }}</p>
@@ -263,33 +266,33 @@ function goBack() {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
 }
 
 .note-header {
   display: flex;
   align-items: center;
   padding: 0.625rem 1.25rem;
-  background: #fff;
-  border-bottom: 1px solid #e5e5e5;
-  gap: 1rem;
+  background: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-lg);
   flex-shrink: 0;
 }
 
 .btn-back {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 0.3rem var(--space-md);
   cursor: pointer;
   font-size: 0.85rem;
-  color: #555;
-  transition: background 0.15s;
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast);
   flex-shrink: 0;
 }
 
 .btn-back:hover {
-  background: #f5f5f5;
+  background: var(--color-bg);
 }
 
 .note-title-area {
@@ -301,7 +304,7 @@ function goBack() {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-heading);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -312,14 +315,14 @@ function goBack() {
 }
 
 .note-title--editable:hover {
-  color: #4a90d9;
+  color: var(--color-primary);
 }
 
 .title-input {
   width: 100%;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #4a90d9;
-  border-radius: 4px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
   font-size: 1.15rem;
   font-weight: 600;
   outline: none;
@@ -328,22 +331,23 @@ function goBack() {
 .note-header-meta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-sm);
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .connection-indicator {
   font-size: 0.65rem;
   font-weight: 600;
   padding: 0.15rem 0.4rem;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .connection-indicator--live {
-  background: #e8f5e9;
-  color: #388e3c;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .connection-indicator--offline {
@@ -353,51 +357,51 @@ function goBack() {
 
 .collaborator-count {
   font-size: 0.7rem;
-  color: #666;
+  color: var(--color-text-muted);
   padding: 0.15rem 0.4rem;
-  background: #f0f0f0;
-  border-radius: 3px;
+  background: var(--color-bg-hover);
+  border-radius: var(--radius-sm);
 }
 
 .btn-share {
-  padding: 0.25rem 0.6rem;
-  background: #fff;
-  color: #4a90d9;
-  border: 1px solid #4a90d9;
-  border-radius: 4px;
+  padding: var(--space-xs) 0.6rem;
+  background: var(--color-bg-white);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
 }
 
 .btn-share:hover {
-  background: #e8f4fd;
+  background: var(--color-primary-light);
 }
 
 .permission-badge {
   font-size: 0.7rem;
   font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  border-radius: 3px;
+  padding: 0.2rem var(--space-sm);
+  border-radius: var(--radius-sm);
 }
 
 .permission-badge--owner {
-  background: #e8f5e9;
-  color: #388e3c;
+  background: var(--color-success-light);
+  color: var(--color-success);
 }
 
 .permission-badge--write {
-  background: #e8f4fd;
-  color: #4a90d9;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .permission-badge--read {
-  background: #f5f5f5;
-  color: #888;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
 }
 
 .ws-error-banner {
-  padding: 0.4rem 1rem;
+  padding: 0.4rem var(--space-lg);
   background: #ffebee;
   color: #c62828;
   text-align: center;
@@ -418,20 +422,21 @@ function goBack() {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 
 .editor-pane {
-  border-right: 1px solid #e5e5e5;
+  border-right: 1px solid var(--color-border);
 }
 
 .pane-label {
-  padding: 0.375rem 1rem;
+  padding: 0.375rem var(--space-lg);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #888;
-  background: #fafafa;
-  border-bottom: 1px solid #e5e5e5;
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
@@ -440,7 +445,8 @@ function goBack() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #888;
+  gap: var(--space-sm);
+  color: var(--color-text-muted);
 }
 
 .error-state {
@@ -449,31 +455,62 @@ function goBack() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  color: #d9534f;
+  gap: var(--space-lg);
+  color: var(--color-danger);
 }
 
 .btn-secondary {
-  padding: 0.375rem 0.75rem;
-  background: #fff;
-  color: #555;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.375rem var(--space-md);
+  background: var(--color-bg-white);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
   font-size: 0.85rem;
   cursor: pointer;
+  transition: background var(--transition-fast);
 }
 
 .btn-secondary:hover {
-  background: #f5f5f5;
+  background: var(--color-bg);
 }
 
 .readonly-banner {
-  padding: 0.5rem 1rem;
-  background: #fff3cd;
-  color: #856404;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
   text-align: center;
   font-size: 0.8rem;
-  border-top: 1px solid #ffeeba;
+  border-top: 1px solid var(--color-warning-border);
   flex-shrink: 0;
+}
+
+/* Responsive: stack editor and preview on small screens */
+@media (max-width: 768px) {
+  .note-header {
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .note-title {
+    font-size: 1rem;
+  }
+
+  .editor-layout {
+    flex-direction: column;
+  }
+
+  .editor-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    flex: 1;
+  }
+
+  .preview-pane {
+    flex: 1;
+  }
+
+  .collaborator-count {
+    display: none;
+  }
 }
 </style>

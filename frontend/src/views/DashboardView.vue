@@ -17,6 +17,7 @@ const selectedFolderId = ref<string | null>(null);
 const shareModalVisible = ref(false);
 const shareResourceType = ref<'note' | 'folder'>('note');
 const shareResourceId = ref('');
+const sidebarOpen = ref(false);
 
 onMounted(async () => {
   await Promise.all([foldersStore.loadFolders(), notesStore.loadNotes()]);
@@ -25,6 +26,7 @@ onMounted(async () => {
 function onFolderSelect(folderId: string | null) {
   selectedFolderId.value = folderId;
   notesStore.loadNotes(folderId ?? undefined);
+  sidebarOpen.value = false;
 }
 
 async function createNote() {
@@ -64,12 +66,23 @@ function openShareModal(type: 'note' | 'folder', id: string) {
 function closeShareModal() {
   shareModalVisible.value = false;
 }
+
+function toggleSidebar() {
+  sidebarOpen.value = !sidebarOpen.value;
+}
 </script>
 
 <template>
   <div class="dashboard">
     <header class="dashboard-header">
-      <h1>Notes</h1>
+      <div class="header-left">
+        <button class="btn-menu" @click="toggleSidebar" aria-label="Toggle sidebar">
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+        </button>
+        <h1>Notes</h1>
+      </div>
       <div class="header-right">
         <span class="user-email">{{ authStore.user?.email }}</span>
         <button class="btn-secondary" @click="handleLogout">Logout</button>
@@ -77,7 +90,14 @@ function closeShareModal() {
     </header>
 
     <div class="dashboard-body">
-      <aside class="sidebar">
+      <!-- Overlay for mobile sidebar -->
+      <div
+        v-if="sidebarOpen"
+        class="sidebar-overlay"
+        @click="sidebarOpen = false"
+      ></div>
+
+      <aside class="sidebar" :class="{ 'sidebar--open': sidebarOpen }">
         <FolderTree
           @select="onFolderSelect"
           @share="(folderId: string) => openShareModal('folder', folderId)"
@@ -93,7 +113,8 @@ function closeShareModal() {
         </div>
 
         <div v-if="notesStore.loading || foldersStore.loading" class="loading">
-          Loading...
+          <span class="spinner"></span>
+          <span>Loading...</span>
         </div>
 
         <div v-if="notesStore.error" class="error-banner">
@@ -130,125 +151,202 @@ function closeShareModal() {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
 }
 
 .dashboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background: #fff;
-  border-bottom: 1px solid #e5e5e5;
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
 }
 
 .dashboard-header h1 {
   margin: 0;
   font-size: 1.25rem;
-  color: #333;
+  color: var(--color-text-heading);
+}
+
+.btn-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-xs);
+}
+
+.menu-bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--color-text-secondary);
+  border-radius: 1px;
+  transition: var(--transition-fast);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-md);
 }
 
 .user-email {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .dashboard-body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+}
+
+.sidebar-overlay {
+  display: none;
 }
 
 .sidebar {
-  width: 260px;
-  background: #fff;
-  border-right: 1px solid #e5e5e5;
+  width: var(--sidebar-width);
+  background: var(--color-bg-white);
+  border-right: 1px solid var(--color-border);
   overflow-y: auto;
   flex-shrink: 0;
+  transition: transform var(--transition-normal);
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: var(--space-xl);
 }
 
 .content-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-lg);
 }
 
 .content-header h2 {
   margin: 0;
   font-size: 1.1rem;
-  color: #333;
+  color: var(--color-text-heading);
 }
 
 .notes-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
 .loading {
-  text-align: center;
-  color: #888;
-  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--color-text-muted);
+  padding: var(--space-2xl);
 }
 
 .error-banner {
-  padding: 0.75rem 1rem;
-  background: #fdf2f2;
-  color: #d9534f;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
   font-size: 0.875rem;
 }
 
 .empty-state {
   text-align: center;
-  color: #888;
-  padding: 3rem 1rem;
+  color: var(--color-text-muted);
+  padding: 3rem var(--space-lg);
   font-size: 0.95rem;
 }
 
 .btn-primary {
-  padding: 0.5rem 1rem;
-  background: #4a90d9;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
 }
 
 .btn-primary:hover {
-  background: #357abd;
+  background: var(--color-primary-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
-  padding: 0.375rem 0.75rem;
-  background: #fff;
-  color: #555;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.375rem var(--space-md);
+  background: var(--color-bg-white);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
   font-size: 0.8rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
 }
 
 .btn-secondary:hover {
-  background: #f5f5f5;
+  background: var(--color-bg);
+}
+
+/* Responsive: mobile sidebar */
+@media (max-width: 768px) {
+  .btn-menu {
+    display: flex;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 10;
+  }
+
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 20;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  .content {
+    padding: var(--space-lg);
+  }
+
+  .user-email {
+    display: none;
+  }
 }
 </style>

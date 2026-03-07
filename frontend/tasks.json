@@ -271,8 +271,8 @@
       "name": "UI Polish & Responsive Layout",
       "phase": "polish",
       "description": "Apply global styles, layout improvements, and ensure the app is usable and visually coherent. This task is complete when: (1) A global CSS file (or scoped styles in App.vue) provides a consistent base: reset/normalize, font stack, color variables, spacing scale. (2) The DashboardView has a responsive layout — sidebar collapses on small screens (hamburger menu or drawer). (3) The NoteView editor/preview layout adapts: on larger screens, side-by-side; on smaller screens, tabbed or stacked. (4) All forms (login, register, share) have consistent styling: input borders, focus states, error states (red border/text), button styles. (5) Loading states use a consistent spinner or skeleton UI. (6) Error messages are displayed in a consistent manner (e.g. toast/banner). (7) The app has a clean, minimal look — no unstyled HTML elements visible. (8) All interactive elements have hover/focus states for accessibility. (9) The app is navigable via keyboard (tab order, Enter to submit forms).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-14", "FE-17", "FE-19", "FE-22"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 22,
+    "completedTasks": 23,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
