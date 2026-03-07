@@ -1,6 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": [
+    "README.md",
+    "AGENTS.md",
     "docs/api.md",
     "docs/schema.md",
     "docs/auth.md",
