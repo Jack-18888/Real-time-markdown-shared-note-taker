@@ -19,8 +19,8 @@
       "name": "API Client with Auth Interceptors",
       "phase": "foundation",
       "description": "Create the Axios API client singleton with request and response interceptors for JWT auth. This task is complete when: (1) `frontend/src/api/client.ts` exports a default Axios instance with `baseURL: 'http://localhost:3000/api'`. (2) A request interceptor reads the access token from the auth store and sets the `Authorization: Bearer <token>` header on every outgoing request. (3) A response interceptor catches 401 responses, attempts a token refresh via the auth store's `refresh()` action, and retries the original request with the new token. If refresh fails, it calls `auth.logout()` to clear state and redirect. (4) The interceptor avoids infinite retry loops — if the retried request also returns 401, it does not attempt another refresh. (5) The Axios instance is the single source for all API calls — no other Axios instances are created anywhere in the project.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-01"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 1,
+    "completedTasks": 2,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
