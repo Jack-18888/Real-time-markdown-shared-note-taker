@@ -127,8 +127,8 @@
       "name": "Notes Pinia Store",
       "phase": "core",
       "description": "Implement the Pinia store for note state management. This task is complete when: (1) `frontend/src/stores/notes.ts` exports a `useNotesStore` using the setup store pattern. (2) State: `notes` (reactive ref, array of note list items — id, title, folderId, ownerId, createdAt, updatedAt, permission — NO content), `currentNote` (reactive ref, full note object including content, or null), `loading` (ref boolean), `error` (ref string | null). (3) Action `loadNotes(folderId?)`: calls `fetchNotes()` API with optional filter, stores result in `notes`, manages loading/error. (4) Action `loadNote(id)`: calls `fetchNote()` API, stores result in `currentNote`. (5) Action `addNote(title, content, folderId?)`: calls `createNote()` API, appends to `notes` array, returns the created note. (6) Action `editNote(id, data)`: calls `updateNote()` API, updates the note in the `notes` array AND updates `currentNote` if it matches the id. (7) Action `removeNote(id)`: calls `deleteNote()` API, removes from `notes` array, clears `currentNote` if it was the deleted note. (8) Action `updateCurrentNoteContent(content)`: updates only the `currentNote.content` field locally (used for real-time collaboration where content comes from WebSocket, not REST). (9) All actions manage loading/error state correctly.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-08"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 9,
+    "completedTasks": 10,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
