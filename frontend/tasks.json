@@ -31,8 +31,8 @@
       "name": "Auth API Module",
       "phase": "foundation",
       "description": "Create the API wrapper functions for all auth endpoints. This task is complete when: (1) `frontend/src/api/auth.ts` exports four async functions: `registerUser(email, password)` calls POST /api/auth/register and returns { user, accessToken, refreshToken }; `loginUser(email, password)` calls POST /api/auth/login and returns the same shape; `refreshToken(refreshToken)` calls POST /api/auth/refresh and returns { accessToken, refreshToken }; `logoutUser(refreshToken)` calls POST /api/auth/logout. (2) All functions use the shared Axios client from `api/client.ts`. (3) All functions are properly typed with TypeScript interfaces for request and response shapes. (4) Error responses are not caught here — they propagate to the caller (store or component).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-02"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 2,
+    "completedTasks": 3,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
