@@ -175,8 +175,8 @@
       "name": "MarkdownEditor Component",
       "phase": "ui",
       "description": "Implement the markdown text editor component. This task is complete when: (1) `frontend/src/components/MarkdownEditor.vue` uses `<script setup lang=\"ts\">`. (2) Props: `modelValue` (string — the raw markdown content), `readonly` (boolean, default false). (3) Emits: `update:modelValue` (string) — enabling v-model usage. (4) Renders a `<textarea>` (or equivalent editable element) that displays and allows editing the raw markdown text. (5) When readonly is true, the textarea is disabled/non-editable. (6) The textarea fills its container and has appropriate styling (monospace font, reasonable padding). (7) The component emits `update:modelValue` on every input change (not debounced — debouncing is the caller's responsibility). (8) Supports tab key insertion (inserts a tab character or spaces instead of moving focus).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-01"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 13,
+    "completedTasks": 14,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
