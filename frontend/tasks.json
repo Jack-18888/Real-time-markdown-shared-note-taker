@@ -163,8 +163,8 @@
       "name": "DashboardView",
       "phase": "ui",
       "description": "Implement the main dashboard page that combines the folder sidebar and note list. This task is complete when: (1) `frontend/src/views/DashboardView.vue` uses `<script setup lang=\"ts\">`. (2) The layout has a sidebar containing the FolderTree component and a main content area showing the list of notes. (3) On mount, it loads folders (via folders store) and notes (via notes store). (4) When a folder is selected in the FolderTree, the notes list is filtered to show notes in that folder (calls `notesStore.loadNotes(folderId)` or filters locally). (5) A 'New Note' button creates a new note (prompts for title or uses a default) in the currently selected folder (or root if none selected), then navigates to `/notes/:id`. (6) Notes are rendered using the NoteCard component. (7) When a note card's delete event fires, the dashboard calls `notesStore.removeNote(id)` and refreshes the list. (8) Loading and error states from both stores are displayed to the user (loading spinner, error banner). (9) A logout button is visible that calls `authStore.logout()` and redirects to `/login`. (10) The current user's email is displayed somewhere in the header/nav area.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-10", "FE-11", "FE-12", "FE-13"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 15,
+    "completedTasks": 16,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
