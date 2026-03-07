@@ -259,8 +259,8 @@
       "name": "Integrate Real-time Collaboration into NoteView",
       "phase": "realtime",
       "description": "Wire the note collaboration composable into the NoteView so real-time editing works. This task is complete when: (1) NoteView uses `useNoteCollaboration(noteId)` composable. (2) When the user types in the editor, the content update is sent both to the REST API (debounced save) and to the WebSocket (debounced via the composable's `sendUpdate`). (3) When a `note:updated` event arrives from another collaborator, the editor content updates without disrupting the local user's cursor position (or at minimum, the content updates visibly). (4) The collaborators list is displayed in the NoteView UI (e.g. showing user IDs or emails of other active editors). (5) When a user navigates away from the note, `note:leave` is sent and the room is cleaned up. (6) If the WebSocket connection is lost, the user can still edit via REST API (graceful degradation). (7) A visual indicator shows whether the WebSocket is connected (e.g. a small dot or text like 'Live' / 'Offline'). (8) The note content received from the initial `note:joined` event is used as the starting content instead of (or merged with) the REST API fetch, to ensure the latest version is shown.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-17", "FE-21"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 21,
+    "completedTasks": 22,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],

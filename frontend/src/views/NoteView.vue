@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNotesStore } from '@/stores/notes';
 import { useAuthStore } from '@/stores/auth';
+import { useNoteCollaboration } from '@/composables/useNoteCollaboration';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ShareModal from '@/components/ShareModal.vue';
@@ -13,12 +14,24 @@ const notesStore = useNotesStore();
 const authStore = useAuthStore();
 
 const noteId = computed(() => route.params.id as string);
+const noteIdRef = ref(noteId.value);
 const editingTitle = ref(false);
 const titleInput = ref('');
 const localContent = ref('');
 const shareModalVisible = ref(false);
 
+// Track whether the latest local content change came from the user or from WS
+let contentFromWs = false;
+
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+// Set up real-time collaboration
+const {
+  collaborators,
+  error: wsError,
+  isConnected,
+  sendUpdate,
+} = useNoteCollaboration(noteIdRef);
 
 const isOwner = computed(
   () => notesStore.currentNote?.ownerId === authStore.user?.id
@@ -44,6 +57,10 @@ const permissionLabel = computed(() => {
   }
 });
 
+const connectionLabel = computed(() => {
+  return isConnected.value ? 'Live' : 'Offline';
+});
+
 onMounted(async () => {
   await notesStore.loadNote(noteId.value);
   if (notesStore.currentNote) {
@@ -66,16 +83,42 @@ onUnmounted(() => {
 watch(noteId, async (newId) => {
   if (saveTimeout) {
     clearTimeout(saveTimeout);
+    saveTimeout = null;
   }
+  noteIdRef.value = newId;
   await notesStore.loadNote(newId);
   if (notesStore.currentNote) {
     localContent.value = notesStore.currentNote.content;
   }
 });
 
+// Watch for remote content updates via WebSocket (note:updated and note:joined)
+// The collaboration composable updates notesStore.currentNote.content via updateCurrentNoteContent
+watch(
+  () => notesStore.currentNote?.content,
+  (newContent) => {
+    if (newContent !== undefined && newContent !== localContent.value) {
+      contentFromWs = true;
+      localContent.value = newContent;
+    }
+  }
+);
+
 function onContentChange(value: string) {
   localContent.value = value;
 
+  // If this content change came from a WS update, don't re-send or re-save
+  if (contentFromWs) {
+    contentFromWs = false;
+    return;
+  }
+
+  // Send via WebSocket for real-time collaboration (debounced inside composable)
+  if (!isReadonly.value) {
+    sendUpdate(value);
+  }
+
+  // Save via REST API (debounced 500ms)
   if (saveTimeout) {
     clearTimeout(saveTimeout);
   }
@@ -137,6 +180,24 @@ function goBack() {
       </div>
 
       <div class="note-header-meta">
+        <span
+          class="connection-indicator"
+          :class="{
+            'connection-indicator--live': isConnected,
+            'connection-indicator--offline': !isConnected,
+          }"
+        >
+          {{ connectionLabel }}
+        </span>
+
+        <span
+          v-if="collaborators.length > 0"
+          class="collaborator-count"
+          :title="collaborators.join(', ')"
+        >
+          {{ collaborators.length }} collaborator{{ collaborators.length === 1 ? '' : 's' }}
+        </span>
+
         <button
           v-if="isOwner"
           class="btn-share"
@@ -156,6 +217,10 @@ function goBack() {
         </span>
       </div>
     </header>
+
+    <div v-if="wsError" class="ws-error-banner">
+      WebSocket: {{ wsError.message }}
+    </div>
 
     <div v-if="notesStore.loading" class="loading">Loading note...</div>
 
@@ -267,6 +332,33 @@ function goBack() {
   flex-shrink: 0;
 }
 
+.connection-indicator {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.connection-indicator--live {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.connection-indicator--offline {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.collaborator-count {
+  font-size: 0.7rem;
+  color: #666;
+  padding: 0.15rem 0.4rem;
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
 .btn-share {
   padding: 0.25rem 0.6rem;
   background: #fff;
@@ -302,6 +394,16 @@ function goBack() {
 .permission-badge--read {
   background: #f5f5f5;
   color: #888;
+}
+
+.ws-error-banner {
+  padding: 0.4rem 1rem;
+  background: #ffebee;
+  color: #c62828;
+  text-align: center;
+  font-size: 0.8rem;
+  border-bottom: 1px solid #ffcdd2;
+  flex-shrink: 0;
 }
 
 .editor-layout {
