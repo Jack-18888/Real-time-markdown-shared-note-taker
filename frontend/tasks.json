@@ -247,8 +247,8 @@
       "name": "Note Collaboration Composable",
       "phase": "realtime",
       "description": "Implement the note-specific real-time collaboration composable that wraps the WebSocket composable. This task is complete when: (1) `frontend/src/composables/useNoteCollaboration.ts` exports a composable function `useNoteCollaboration(noteId: Ref<string>)`. (2) When noteId changes (or on initial call), it sends a `note:join` event with { noteId } via the WebSocket composable. (3) When noteId changes to a different value, it first sends `note:leave` for the previous noteId, then `note:join` for the new one. (4) On unmount (via `onUnmounted`), it sends `note:leave` for the current noteId. (5) Listens for `note:joined` — updates the notes store's currentNote content with the received content, and exposes the collaborators list as a reactive ref. (6) Listens for `note:updated` — updates the notes store's currentNote content with the received content (calls `notesStore.updateCurrentNoteContent(content)`), ensuring the update does NOT trigger a re-send back to the server (guards against echo loops). (7) Listens for `note:presence` — updates the collaborators reactive ref. (8) Listens for `note:error` — exposes error state as a reactive ref. (9) Exposes a `sendUpdate(content: string)` function that sends `note:update` with { noteId, content } — this function should be debounced internally at ~300ms. (10) Exposes reactive refs: `collaborators` (string[]), `error` ({ code, message } | null), `isConnected` (boolean from the WebSocket composable).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-20", "FE-11"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 20,
+    "completedTasks": 21,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
