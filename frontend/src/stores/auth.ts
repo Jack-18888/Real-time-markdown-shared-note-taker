@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<AuthUser | null>(null);
   const accessToken = ref<string | null>(null);
   const refreshTokenValue = ref<string | null>(null);
+  const initializing = ref(false);
 
   const isAuthenticated = computed(
     () => user.value !== null && accessToken.value !== null
@@ -77,6 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     const token = localStorage.getItem(REFRESH_TOKEN_KEY);
     if (!token) return;
 
+    initializing.value = true;
     refreshTokenValue.value = token;
 
     try {
@@ -89,6 +91,8 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = { id: payload.sub, email: payload.email };
     } catch {
       clearState();
+    } finally {
+      initializing.value = false;
     }
   }
 
@@ -105,6 +109,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     accessToken,
     refreshTokenValue,
+    initializing,
     isAuthenticated,
     login,
     register,

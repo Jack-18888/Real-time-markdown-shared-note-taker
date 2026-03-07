@@ -283,8 +283,8 @@
       "name": "App Initialization & Token Restore Flow",
       "phase": "polish",
       "description": "Ensure the app properly initializes on startup, restoring the user session if a refresh token exists. This task is complete when: (1) In `main.ts`, before mounting the app, `authStore.initialize()` is called and awaited. (2) If a refresh token is found in localStorage, the app attempts a token refresh. If successful, the user is logged in and can navigate to protected routes. If it fails, the refresh token is cleared and the user is redirected to /login. (3) While initialization is in progress, the app shows a loading state (e.g. a full-screen spinner) instead of briefly flashing the login page. (4) The router guards work correctly after initialization — they check the auth store state which has been populated by the initialize flow. (5) If no refresh token is in localStorage, initialization completes immediately and the user sees the login page.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-04", "FE-05"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 23,
+    "completedTasks": 24,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
