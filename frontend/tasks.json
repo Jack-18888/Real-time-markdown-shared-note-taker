@@ -187,8 +187,8 @@
       "name": "MarkdownPreview Component",
       "phase": "ui",
       "description": "Implement the rendered markdown preview component. This task is complete when: (1) `frontend/src/components/MarkdownPreview.vue` uses `<script setup lang=\"ts\">`. (2) Props: `content` (string — raw markdown to render). (3) Uses `marked` or `markdown-it` library to convert the raw markdown string to HTML. (4) Renders the HTML output safely using `v-html` with appropriate sanitization to prevent XSS (use DOMPurify or the library's built-in sanitization if available). (5) The preview updates reactively when the `content` prop changes. (6) Basic markdown features render correctly: headings (h1-h6), bold, italic, code blocks, inline code, links, lists (ordered and unordered), blockquotes, horizontal rules, images. (7) The preview container has appropriate CSS styling for readability (prose-like typography, spacing between elements).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-01"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 14,
+    "completedTasks": 15,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
