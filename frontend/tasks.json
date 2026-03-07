@@ -7,8 +7,8 @@
       "name": "Project Scaffold & Configuration",
       "phase": "foundation",
       "description": "Initialize the frontend Vue.js 3 project with Vite and all required dependencies and configuration files. This task is complete when: (1) `frontend/package.json` exists with all runtime dependencies (vue ^3.x, vue-router ^4.x, pinia ^2.x, axios ^1.x, marked or markdown-it for markdown rendering). (2) All dev dependencies are installed (vite, @vitejs/plugin-vue, typescript, vue-tsc). (3) `frontend/tsconfig.json` exists with strict mode enabled, targeting ESNext, module ESNext, moduleResolution bundler, jsx preserve, and paths configured for `@/*` alias to `src/*`. (4) `frontend/vite.config.ts` exists with the Vue plugin registered and server proxy or port configured (dev server on port 5173). (5) `frontend/src/main.ts` exists as the app entry point that creates the Vue app, registers Pinia and Vue Router, and mounts to `#app`. (6) `frontend/src/App.vue` exists as the root component containing a `<router-view />`. (7) `frontend/index.html` exists with the mount point `<div id=\"app\">`. (8) `npm run dev` starts the Vite dev server without errors. (9) `npm run build` compiles without TypeScript errors. (10) `frontend/.gitignore` ignores node_modules and dist.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": [],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 0,
+    "completedTasks": 1,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
