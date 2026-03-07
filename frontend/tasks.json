@@ -199,8 +199,8 @@
       "name": "NoteView with Editor & Preview",
       "phase": "ui",
       "description": "Implement the full note editing page combining editor and preview. This task is complete when: (1) `frontend/src/views/NoteView.vue` uses `<script setup lang=\"ts\">`. (2) On mount, it reads the note ID from the route params and calls `notesStore.loadNote(id)`. (3) The layout shows the MarkdownEditor on one side and MarkdownPreview on the other (side-by-side or toggle-able). (4) The editor is bound to the current note's content via v-model. (5) When the user types, the content updates in real-time in the preview. (6) The note title is displayed and editable (inline edit or input field). Editing the title calls `notesStore.editNote(id, { title })`. (7) Content changes are saved via `notesStore.editNote(id, { content })` — debounced at ~500ms to avoid excessive API calls. (8) If the user has only 'read' permission, the editor is in readonly mode and a visual indicator shows 'Read Only'. (9) If the user has 'write' or 'owner' permission, the editor is fully editable. (10) A 'Back' button or breadcrumb navigates back to the dashboard. (11) Loading and error states are handled (show spinner while loading, show error message if note not found or no access). (12) The note's permission level is displayed somewhere on the page.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-11", "FE-15", "FE-16"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 16,
+    "completedTasks": 17,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
