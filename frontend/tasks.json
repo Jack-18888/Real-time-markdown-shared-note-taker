@@ -151,8 +151,8 @@
       "name": "NoteCard Component",
       "phase": "ui",
       "description": "Implement the note list item card component. This task is complete when: (1) `frontend/src/components/NoteCard.vue` uses `<script setup lang=\"ts\">`. (2) Props: `note` (typed object with id, title, folderId, ownerId, createdAt, updatedAt, permission). (3) Displays the note title and last updated time (formatted as relative time or readable date). (4) Shows a visual indicator for the user's permission level (owner, write, read). (5) Clicking the card navigates to `/notes/:id` using the router. (6) If the user is the owner, shows a delete button/icon that emits a `delete` event with the note id. (7) The component does not make API calls directly — it only renders props and emits events.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-01"],
       "estimatedEffort": "small",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 12,
+    "completedTasks": 13,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
