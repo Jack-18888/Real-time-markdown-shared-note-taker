@@ -115,8 +115,8 @@
       "name": "Folders Pinia Store",
       "phase": "core",
       "description": "Implement the Pinia store for folder state management. This task is complete when: (1) `frontend/src/stores/folders.ts` exports a `useFoldersStore` using the setup store pattern. (2) State: `folders` (reactive ref, array of folder objects with id, name, parentId, ownerId, createdAt, updatedAt, permission), `loading` (ref boolean), `error` (ref string | null). (3) Computed getter `rootFolders` returns folders where parentId is null. (4) Computed getter or method `getChildFolders(parentId)` returns folders whose parentId matches. (5) Action `loadFolders()`: calls `fetchFolders()` API, stores result in `folders`, manages loading/error state. (6) Action `addFolder(name, parentId?)`: calls `createFolder()` API, appends the returned folder to the `folders` array. (7) Action `editFolder(id, data)`: calls `updateFolder()` API, updates the folder in the local array. (8) Action `removeFolder(id)`: calls `deleteFolder()` API, removes the folder (and any children) from the local array. (9) All actions set `loading = true` before the API call and `loading = false` after (in finally block). (10) All actions catch errors and set the `error` state with the error message.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-07"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 8,
+    "completedTasks": 9,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
