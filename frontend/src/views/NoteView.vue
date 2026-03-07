@@ -228,7 +228,15 @@ function goBack() {
     </div>
 
     <div v-else-if="notesStore.error" class="error-state">
-      <p>{{ notesStore.error }}</p>
+      <div v-if="notesStore.errorStatus === 403" class="error-icon">&#128274;</div>
+      <div v-else-if="notesStore.errorStatus === 404" class="error-icon">&#128269;</div>
+      <div v-else class="error-icon">&#9888;</div>
+      <p class="error-title">
+        <template v-if="notesStore.errorStatus === 403">Access Denied</template>
+        <template v-else-if="notesStore.errorStatus === 404">Note Not Found</template>
+        <template v-else>Something went wrong</template>
+      </p>
+      <p class="error-detail">{{ notesStore.error }}</p>
       <button class="btn-secondary" @click="goBack">Go back to Dashboard</button>
     </div>
 
@@ -455,8 +463,29 @@ function goBack() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-lg);
-  color: var(--color-danger);
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+  padding: var(--space-xl);
+}
+
+.error-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.error-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin: 0;
+}
+
+.error-detail {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  text-align: center;
+  max-width: 400px;
 }
 
 .btn-secondary {

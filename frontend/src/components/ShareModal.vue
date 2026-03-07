@@ -14,6 +14,7 @@ import {
 } from '@/api/folders';
 import type { NoteShare } from '@/api/notes';
 import type { FolderShare } from '@/api/folders';
+import { extractErrorMessage } from '@/api/client';
 
 type Share = NoteShare | FolderShare;
 
@@ -61,12 +62,7 @@ async function loadShares() {
       shares.value = await fetchFolderShares(props.resourceId);
     }
   } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      error.value = axiosErr.response?.data?.error || 'Failed to load shares';
-    } else {
-      error.value = 'Failed to load shares';
-    }
+    error.value = extractErrorMessage(err, 'Failed to load shares');
   } finally {
     loading.value = false;
   }
@@ -88,12 +84,7 @@ async function addShare() {
     newPermission.value = 'read';
     await loadShares();
   } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      addError.value = axiosErr.response?.data?.error || 'Failed to add share';
-    } else {
-      addError.value = 'Failed to add share';
-    }
+    addError.value = extractErrorMessage(err, 'Failed to add share');
   } finally {
     addingShare.value = false;
   }
@@ -108,12 +99,7 @@ async function changePermission(userId: string, permission: 'read' | 'write') {
     }
     await loadShares();
   } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      error.value = axiosErr.response?.data?.error || 'Failed to update share';
-    } else {
-      error.value = 'Failed to update share';
-    }
+    error.value = extractErrorMessage(err, 'Failed to update share');
   }
 }
 
@@ -126,12 +112,7 @@ async function removeShare(userId: string) {
     }
     await loadShares();
   } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      error.value = axiosErr.response?.data?.error || 'Failed to remove share';
-    } else {
-      error.value = 'Failed to remove share';
-    }
+    error.value = extractErrorMessage(err, 'Failed to remove share');
   }
 }
 

@@ -295,8 +295,8 @@
       "name": "Error Handling & Edge Cases",
       "phase": "polish",
       "description": "Ensure all error scenarios are handled gracefully across the app. This task is complete when: (1) Network errors (server unreachable) display a user-friendly message rather than a raw error. (2) 403 responses on notes/folders show 'You do not have access' and offer navigation back to the dashboard. (3) 404 responses show 'Not found' with a back link. (4) Token expiry during active use (e.g. mid-edit) triggers a silent refresh — if refresh succeeds, the operation is retried transparently. If refresh fails, the user is redirected to login with a message. (5) WebSocket disconnection during editing does not lose unsaved content — the latest content is held in the store. (6) Creating a note or folder while offline/disconnected shows an error without crashing. (7) Double-clicking submit buttons does not create duplicate resources (disable button while loading). (8) All `async` actions in stores have try/catch blocks and set error state on failure.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-07",
       "relatedCommit": null,
       "dependsOn": ["FE-14", "FE-17", "FE-22"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 24,
+    "completedTasks": 25,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],

@@ -7,6 +7,7 @@ import {
   deleteFolder,
 } from '@/api/folders';
 import type { Folder } from '@/api/folders';
+import { extractErrorMessage } from '@/api/client';
 
 export const useFoldersStore = defineStore('folders', () => {
   const folders = ref<Folder[]>([]);
@@ -27,9 +28,7 @@ export const useFoldersStore = defineStore('folders', () => {
     try {
       folders.value = await fetchFolders();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to load folders';
-      error.value = message;
+      error.value = extractErrorMessage(err, 'Failed to load folders');
     } finally {
       loading.value = false;
     }
@@ -43,9 +42,7 @@ export const useFoldersStore = defineStore('folders', () => {
       folders.value.push({ ...folder, permission: 'owner' });
       return folder;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to create folder';
-      error.value = message;
+      error.value = extractErrorMessage(err, 'Failed to create folder');
       throw err;
     } finally {
       loading.value = false;
@@ -69,9 +66,7 @@ export const useFoldersStore = defineStore('folders', () => {
       }
       return updated;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to update folder';
-      error.value = message;
+      error.value = extractErrorMessage(err, 'Failed to update folder');
       throw err;
     } finally {
       loading.value = false;
@@ -100,9 +95,7 @@ export const useFoldersStore = defineStore('folders', () => {
 
       folders.value = folders.value.filter((f) => !idsToRemove.has(f.id));
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to delete folder';
-      error.value = message;
+      error.value = extractErrorMessage(err, 'Failed to delete folder');
       throw err;
     } finally {
       loading.value = false;

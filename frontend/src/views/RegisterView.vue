@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { extractErrorMessage } from '@/api/client';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -31,12 +32,7 @@ async function handleSubmit() {
     await authStore.register(email.value, password.value);
     router.push('/');
   } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const axiosErr = err as { response?: { data?: { error?: string } } };
-      error.value = axiosErr.response?.data?.error || 'Registration failed';
-    } else {
-      error.value = err instanceof Error ? err.message : 'Registration failed';
-    }
+    error.value = extractErrorMessage(err, 'Registration failed');
   } finally {
     loading.value = false;
   }

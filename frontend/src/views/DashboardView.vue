@@ -18,6 +18,8 @@ const shareModalVisible = ref(false);
 const shareResourceType = ref<'note' | 'folder'>('note');
 const shareResourceId = ref('');
 const sidebarOpen = ref(false);
+const creatingNote = ref(false);
+const deletingNoteId = ref<string | null>(null);
 
 onMounted(async () => {
   await Promise.all([foldersStore.loadFolders(), notesStore.loadNotes()]);
@@ -30,6 +32,8 @@ function onFolderSelect(folderId: string | null) {
 }
 
 async function createNote() {
+  if (creatingNote.value) return;
+  creatingNote.value = true;
   try {
     const note = await notesStore.addNote(
       'Untitled Note',
@@ -41,14 +45,20 @@ async function createNote() {
     }
   } catch {
     // error is set in the store
+  } finally {
+    creatingNote.value = false;
   }
 }
 
 async function handleDeleteNote(noteId: string) {
+  if (deletingNoteId.value) return;
+  deletingNoteId.value = noteId;
   try {
     await notesStore.removeNote(noteId);
   } catch {
     // error is set in the store
+  } finally {
+    deletingNoteId.value = null;
   }
 }
 
@@ -109,7 +119,9 @@ function toggleSidebar() {
           <h2>
             {{ selectedFolderId ? 'Folder Notes' : 'All Notes' }}
           </h2>
-          <button class="btn-primary" @click="createNote">+ New Note</button>
+          <button class="btn-primary" :disabled="creatingNote" @click="createNote">
+            {{ creatingNote ? 'Creating...' : '+ New Note' }}
+          </button>
         </div>
 
         <div v-if="notesStore.loading || foldersStore.loading" class="loading">
@@ -119,6 +131,10 @@ function toggleSidebar() {
 
         <div v-if="notesStore.error" class="error-banner">
           {{ notesStore.error }}
+        </div>
+
+        <div v-if="foldersStore.error" class="error-banner">
+          {{ foldersStore.error }}
         </div>
 
         <div v-if="!notesStore.loading && notesStore.notes.length === 0 && !notesStore.error" class="empty-state">
