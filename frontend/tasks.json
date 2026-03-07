@@ -43,8 +43,8 @@
       "name": "Auth Pinia Store",
       "phase": "auth",
       "description": "Implement the Pinia auth store managing user session state and token lifecycle. This task is complete when: (1) `frontend/src/stores/auth.ts` exports a `useAuthStore` Pinia store using the setup store pattern (Composition API style). (2) State includes: `user` (reactive ref, `{ id: string, email: string } | null`, initially null), `accessToken` (reactive ref, `string | null`, stored in memory only — never in localStorage), `refreshToken` (reactive ref, `string | null`, synced with localStorage). (3) Computed getter `isAuthenticated` returns true when `user` is not null and `accessToken` is not null. (4) Action `login(email, password)`: calls the auth API's `loginUser`, stores the returned user, accessToken, and refreshToken (refreshToken also persisted to localStorage). (5) Action `register(email, password)`: calls `registerUser`, stores tokens and user same as login. (6) Action `logout()`: calls the auth API's `logoutUser` with the current refresh token, clears user/accessToken/refreshToken from state, removes refreshToken from localStorage. Logout must not throw even if the API call fails (catch and ignore). (7) Action `refresh()`: reads refreshToken from state (or localStorage as fallback), calls `refreshToken` API, updates accessToken and refreshToken in state and localStorage, returns true on success, returns false on failure (does not throw). (8) Action `initialize()`: called on app startup in main.ts — if a refreshToken exists in localStorage, attempts a refresh to restore the session; if refresh fails, clears state silently. (9) The store does NOT import or use `req`/`res` or any backend-specific types.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-03"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 3,
+    "completedTasks": 4,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
