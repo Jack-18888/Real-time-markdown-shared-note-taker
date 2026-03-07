@@ -139,8 +139,8 @@
       "name": "FolderTree Component",
       "phase": "ui",
       "description": "Implement the sidebar folder tree component for hierarchical folder navigation. This task is complete when: (1) `frontend/src/components/FolderTree.vue` uses `<script setup lang=\"ts\">`. (2) It renders the folder hierarchy as a tree structure, with root folders at the top level and child folders nested underneath. (3) Each folder item displays the folder name and can be clicked to select it (filtering notes by folderId). (4) A 'root' or 'All Notes' option is available to show unfiled notes or all notes. (5) Each folder owned by the current user shows action buttons/icons for: rename, delete, create subfolder, and share. (6) Emits events or calls store actions when: a folder is selected (emits `select` with folderId or null), a folder action is triggered. (7) The tree supports expand/collapse for folders with children. (8) A 'New Folder' button is available at the top level to create a root folder. (9) The component reads folder data from the folders store — does not make API calls directly. (10) Folders the user only has read access to are visually distinct (e.g. no delete/rename buttons, or a shared icon).",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-10"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 11,
+    "completedTasks": 12,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
