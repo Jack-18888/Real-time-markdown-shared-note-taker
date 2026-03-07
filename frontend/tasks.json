@@ -67,8 +67,8 @@
       "name": "Login & Register Views",
       "phase": "auth",
       "description": "Implement the login and registration page components. This task is complete when: (1) `frontend/src/views/LoginView.vue` uses `<script setup lang=\"ts\">` and Composition API only. (2) LoginView contains a form with email input, password input, and submit button. (3) On submit, it calls `authStore.login(email, password)`. On success, navigates to `/`. On error, displays the error message from the API response (e.g. 'Invalid credentials', 'Missing required field'). (4) Shows a loading state while the login request is in progress (button disabled or spinner). (5) Has a link to `/register` for new users. (6) `frontend/src/views/RegisterView.vue` has the same structure but calls `authStore.register(email, password)`. (7) RegisterView validates that the password is at least 8 characters client-side before submitting. (8) RegisterView has a link to `/login`. (9) Both views redirect to `/` if the user is already authenticated (handled by router guard, but also defensively in the component). (10) Email and password inputs have appropriate HTML `type` attributes (`email`, `password`). (11) Forms handle Enter key submission.",
-      "completed": false,
-      "completedAt": null,
+      "completed": true,
+      "completedAt": "2026-03-06",
       "relatedCommit": null,
       "dependsOn": ["FE-04", "FE-05"],
       "estimatedEffort": "medium",
@@ -317,7 +317,7 @@
   ],
   "metadata": {
     "totalTasks": 26,
-    "completedTasks": 10,
+    "completedTasks": 11,
     "phases": {
       "foundation": ["FE-01", "FE-02", "FE-03"],
       "auth": ["FE-04", "FE-05", "FE-06"],
