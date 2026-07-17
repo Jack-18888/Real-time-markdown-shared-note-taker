@@ -31,20 +31,20 @@ interface ErrorPayload {
 
 export function useNoteCollaboration(noteId: Ref<string>) {
   const notesStore = useNotesStore();
-  const { connected, send, on, off, disconnect } = useWebSocket();
+  const { connected, send, on, off, onConnect, offConnect, disconnect } = useWebSocket();
 
   const collaborators = ref<string[]>([]);
   const error = ref<NoteError | null>(null);
   const isConnected = connected;
 
-  // Guard against echo loops: ignore incoming updates triggered by own sends
-  let suppressNextIncoming = false;
-
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let currentJoinedNoteId: string | null = null;
 
+  // Track the last content we sent so we can ignore the echo from the store update
+  let lastSentContent: string | null = null;
+
   function joinNote(id: string) {
-    if (currentJoinedNoteId) {
+    if (currentJoinedNoteId && currentJoinedNoteId !== id) {
       send('note:leave', { noteId: currentJoinedNoteId });
     }
     currentJoinedNoteId = id;
@@ -71,10 +71,6 @@ export function useNoteCollaboration(noteId: Ref<string>) {
   function handleUpdated(payload: unknown) {
     const data = payload as UpdatedPayload;
     if (data.noteId !== currentJoinedNoteId) return;
-    if (suppressNextIncoming) {
-      suppressNextIncoming = false;
-      return;
-    }
     notesStore.updateCurrentNoteContent(data.content);
   }
 
@@ -96,6 +92,21 @@ export function useNoteCollaboration(noteId: Ref<string>) {
   on('note:error', handleError);
 
   /**
+   * Called every time the WebSocket (re)connects.
+   * Re-joins the current note room so the server starts
+   * broadcasting updates to this client again.
+   */
+  function handleConnect() {
+    if (currentJoinedNoteId) {
+      collaborators.value = [];
+      error.value = null;
+      send('note:join', { noteId: currentJoinedNoteId });
+    }
+  }
+
+  onConnect(handleConnect);
+
+  /**
    * Send a content update to collaborators via WebSocket.
    * Debounced at 300ms to avoid flooding.
    */
@@ -108,7 +119,7 @@ export function useNoteCollaboration(noteId: Ref<string>) {
 
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
-      suppressNextIncoming = true;
+      lastSentContent = content;
       send('note:update', { noteId: currentJoinedNoteId, content });
     }, 300);
   }
@@ -130,7 +141,7 @@ export function useNoteCollaboration(noteId: Ref<string>) {
     { immediate: false }
   );
 
-  // Initial join
+  // Initial join — the message will be queued if the socket isn't open yet
   if (noteId.value) {
     joinNote(noteId.value);
   }
@@ -143,6 +154,7 @@ export function useNoteCollaboration(noteId: Ref<string>) {
     off('note:updated', handleUpdated);
     off('note:presence', handlePresence);
     off('note:error', handleError);
+    offConnect(handleConnect);
 
     if (debounceTimer) {
       clearTimeout(debounceTimer);
@@ -157,5 +169,7 @@ export function useNoteCollaboration(noteId: Ref<string>) {
     error,
     isConnected,
     sendUpdate,
+    lastSentContent: () => lastSentContent,
   };
 }
+

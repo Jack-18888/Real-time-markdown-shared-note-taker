@@ -20,8 +20,8 @@ const titleInput = ref('');
 const localContent = ref('');
 const shareModalVisible = ref(false);
 
-// Track whether the latest local content change came from the user or from WS
-let contentFromWs = false;
+// Flag to prevent re-sending content received from a remote WS update
+let isRemoteUpdate = false;
 
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -31,6 +31,7 @@ const {
   error: wsError,
   isConnected,
   sendUpdate,
+  lastSentContent,
 } = useNoteCollaboration(noteIdRef);
 
 const isOwner = computed(
@@ -98,7 +99,7 @@ watch(
   () => notesStore.currentNote?.content,
   (newContent) => {
     if (newContent !== undefined && newContent !== localContent.value) {
-      contentFromWs = true;
+      isRemoteUpdate = true;
       localContent.value = newContent;
     }
   }
@@ -108,8 +109,8 @@ function onContentChange(value: string) {
   localContent.value = value;
 
   // If this content change came from a WS update, don't re-send or re-save
-  if (contentFromWs) {
-    contentFromWs = false;
+  if (isRemoteUpdate) {
+    isRemoteUpdate = false;
     return;
   }
 

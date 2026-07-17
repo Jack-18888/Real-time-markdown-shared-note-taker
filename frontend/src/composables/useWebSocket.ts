@@ -2,6 +2,7 @@ import { ref, onUnmounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
 type EventHandler = (payload: unknown) => void;
+type ConnectCallback = () => void;
 
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:3000/ws';
 const MAX_RECONNECT_DELAY = 30000;
@@ -12,6 +13,8 @@ export function useWebSocket() {
 
   let ws: WebSocket | null = null;
   let handlers: Map<string, Set<EventHandler>> = new Map();
+  let connectCallbacks: Set<ConnectCallback> = new Set();
+  let pendingMessages: string[] = [];
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let reconnectAttempts = 0;
   let shouldReconnect = true;
@@ -30,6 +33,17 @@ export function useWebSocket() {
     ws.onopen = () => {
       connected.value = true;
       reconnectAttempts = 0;
+
+      // Flush any messages that were queued while disconnected
+      for (const msg of pendingMessages) {
+        ws!.send(msg);
+      }
+      pendingMessages = [];
+
+      // Notify consumers so they can re-join rooms, etc.
+      for (const cb of connectCallbacks) {
+        cb();
+      }
     };
 
     ws.onclose = () => {
@@ -76,8 +90,12 @@ export function useWebSocket() {
   }
 
   function send(event: string, payload: unknown) {
+    const data = JSON.stringify({ event, payload });
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ event, payload }));
+      ws.send(data);
+    } else {
+      // Queue the message — it will be flushed when the socket opens
+      pendingMessages.push(data);
     }
   }
 
@@ -98,6 +116,18 @@ export function useWebSocket() {
     }
   }
 
+  /**
+   * Register a callback that fires every time the socket (re)connects.
+   * Useful for re-joining rooms after a reconnection.
+   */
+  function onConnect(cb: ConnectCallback) {
+    connectCallbacks.add(cb);
+  }
+
+  function offConnect(cb: ConnectCallback) {
+    connectCallbacks.delete(cb);
+  }
+
   function disconnect() {
     shouldReconnect = false;
     if (reconnectTimer) {
@@ -110,6 +140,8 @@ export function useWebSocket() {
     }
     connected.value = false;
     handlers.clear();
+    connectCallbacks.clear();
+    pendingMessages = [];
   }
 
   // Auto-connect
@@ -124,6 +156,8 @@ export function useWebSocket() {
     send,
     on,
     off,
+    onConnect,
+    offConnect,
     disconnect,
   };
 }
