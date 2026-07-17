@@ -28,6 +28,27 @@ client.interceptors.request.use((config) => {
 
 let isRefreshing = false;
 
+/** Resolvers/rejectors for requests that arrived while a refresh was in flight. */
+type QueueEntry = { resolve: (token: string) => void; reject: (err: unknown) => void };
+let refreshQueue: QueueEntry[] = [];
+
+/**
+ * Drain the queue after a refresh attempt settles.
+ * @param succeeded - true if a new access token is available, false on failure.
+ * @param error     - the original error to forward when the refresh failed.
+ */
+function drainQueue(succeeded: boolean, error?: unknown): void {
+  const token = getAccessToken?.() ?? '';
+  for (const entry of refreshQueue) {
+    if (succeeded) {
+      entry.resolve(token);
+    } else {
+      entry.reject(error);
+    }
+  }
+  refreshQueue = [];
+}
+
 client.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -38,8 +59,14 @@ client.interceptors.response.use(
       !originalRequest._retry &&
       onUnauthorized
     ) {
+      // A refresh is already underway — park this request until it settles.
       if (isRefreshing) {
-        return Promise.reject(error);
+        return new Promise<string>((resolve, reject) => {
+          refreshQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return client.request(originalRequest);
+        });
       }
 
       originalRequest._retry = true;
@@ -48,12 +75,16 @@ client.interceptors.response.use(
       try {
         const refreshed = await onUnauthorized();
         if (refreshed) {
-          const token = getAccessToken?.();
+          const token = getAccessToken?.() ?? '';
+          drainQueue(true);
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return client.request(originalRequest);
         }
+        // Refresh endpoint returned false (e.g. refresh token invalid/expired).
+        drainQueue(false, error);
         onRefreshFailed?.();
-      } catch {
+      } catch (err) {
+        drainQueue(false, err);
         onRefreshFailed?.();
       } finally {
         isRefreshing = false;
