@@ -8,10 +8,11 @@ const app = createApp(App);
 const pinia = createPinia();
 
 app.use(pinia);
-app.use(router);
 
-// Initialize auth (restore session from refresh token) before mounting
+// Initialize auth (restore session from refresh token) before router
+// so the beforeEach guard sees the correct isAuthenticated state
 const authStore = useAuthStore();
 authStore.initialize().then(() => {
+  app.use(router);
   app.mount('#app');
 });
