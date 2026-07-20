@@ -9,10 +9,6 @@ export default async function globalSetup() {
   // Push the Prisma schema to the test database (no migrations, just sync)
   execSync('npx prisma db push --force-reset', {
     cwd: path.resolve(__dirname, '../..'),
-    env: {
-      ...process.env,
-      DATABASE_URL: 'file:./test.db',
-    },
     stdio: 'pipe',
   });
 }

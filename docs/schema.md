@@ -1,7 +1,7 @@
 # Database Schema
 
 ORM: Prisma  
-Database: SQLite  
+Database: PostgreSQL  
 Schema file: `backend/prisma/schema.prisma`
 
 ---

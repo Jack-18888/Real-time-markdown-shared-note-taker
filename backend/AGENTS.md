@@ -1,6 +1,6 @@
 # Backend Agent Instructions
 
-Stack: Node.js + Express + TypeScript + Prisma + SQLite + WebSockets (`ws` library)
+Stack: Node.js + Express + TypeScript + Prisma + PostgreSQL + WebSockets (`ws` library)
 
 Read `docs/api.md`, `docs/schema.md`, `docs/auth.md`, and `docs/conventions.md` before making any backend changes.
 

@@ -10,7 +10,7 @@ A collaborative markdown note-taking app with real-time co-editing, file/folder 
 |-----------|-------------------------------------|
 | Frontend  | Vue.js 3 (Composition API)          |
 | Backend   | Node.js + Express                   |
-| Database  | SQLite (via Prisma ORM)             |
+| Database  | PostgreSQL (via Prisma ORM)          |
 | Auth      | JWT (access + refresh token pair)   |
 | Real-time | WebSockets (ws library)             |
 
@@ -80,6 +80,13 @@ npm install
 npm run dev        # starts on port 5173
 ```
 
+### Using Docker
+
+```bash
+cd backend
+docker compose up     # starts PostgreSQL + backend on port 3000
+```
+
 ---
 
 ## Environment Variables
@@ -87,7 +94,7 @@ npm run dev        # starts on port 5173
 Backend uses a `.env` file at `backend/.env`. Never commit this file.
 
 ```
-DATABASE_URL=
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 JWT_ACCESS_SECRET=
 JWT_REFRESH_SECRET=
 JWT_ACCESS_EXPIRES_IN=
@@ -124,5 +131,5 @@ CLIENT_ORIGIN=
 - **Commit after every task or logical change.** Do not batch multiple tasks into one commit.
 - Commit message format: `type(scope): short description` — e.g. `feat(auth): add register and login routes`.
 - Common types: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`.
-- Never commit `.env` files, `node_modules/`, `dist/`, or SQLite `.db` files.
+- Never commit `.env` files, `node_modules/`, or `dist/`.
 - Update `tasks.json` (`completed`, `completedAt`, `relatedCommit`) as part of the same commit that completes the task.

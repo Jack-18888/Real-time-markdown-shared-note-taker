@@ -16,7 +16,7 @@ A collaborative markdown note-taking application with real-time co-editing, hier
 |-----------|-----------------------------------|
 | Frontend  | Vue.js 3 (Composition API), Pinia, Vue Router, Axios |
 | Backend   | Node.js, Express, TypeScript      |
-| Database  | SQLite via Prisma ORM             |
+| Database  | PostgreSQL via Prisma ORM           |
 | Auth      | JWT (access + refresh tokens)     |
 | Real-time | WebSockets (`ws` library)         |
 
@@ -26,6 +26,7 @@ A collaborative markdown note-taking application with real-time co-editing, hier
 
 - Node.js (v18+)
 - npm
+- PostgreSQL (v14+ running locally, or use Docker)
 
 ### Backend
 
@@ -39,13 +40,20 @@ npm run dev        # starts on http://localhost:3000
 Create a `backend/.env` file with:
 
 ```
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://myuser:mypostgrespassword@localhost:5432/mydatabase"
 JWT_ACCESS_SECRET=<random-64-char-secret>
 JWT_REFRESH_SECRET=<different-random-64-char-secret>
 JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 PORT=3000
 CLIENT_ORIGIN=http://localhost:5173
+```
+
+### Using Docker
+
+```bash
+cd backend
+docker compose up     # starts PostgreSQL + backend on port 3000
 ```
 
 ### Frontend
