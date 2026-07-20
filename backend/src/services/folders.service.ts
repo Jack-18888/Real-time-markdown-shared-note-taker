@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma';
 import { AppError } from '../types';
 import { resolveFolderPermission } from './permissions';
+import { broadcastToUsers, getFolderAccessUserIds } from '../websocket/server';
 
 export async function listFolders(userId: string) {
   // Get owned folders
@@ -64,6 +65,16 @@ export async function createFolder(userId: string, name: string, parentId?: stri
     },
   });
 
+  const userIds = await getFolderAccessUserIds(folder.id);
+  broadcastToUsers(
+    userIds,
+    {
+      event: 'folder:created',
+      payload: { folder },
+    },
+    userId
+  );
+
   return folder;
 }
 
@@ -82,6 +93,8 @@ export async function updateFolder(
     throw new AppError(403, 'FORBIDDEN', 'No write access to this folder');
   }
 
+  const accessUserIdsBefore = await getFolderAccessUserIds(folderId);
+
   const updated = await prisma.folder.update({
     where: { id: folderId },
     data: {
@@ -89,6 +102,18 @@ export async function updateFolder(
       ...(data.parentId !== undefined && { parentId: data.parentId }),
     },
   });
+
+  const accessUserIdsAfter = await getFolderAccessUserIds(folderId);
+  const userIds = Array.from(new Set([...accessUserIdsBefore, ...accessUserIdsAfter]));
+
+  broadcastToUsers(
+    userIds,
+    {
+      event: 'folder:updated',
+      payload: { folder: updated },
+    },
+    userId
+  );
 
   return updated;
 }
@@ -102,6 +127,8 @@ export async function deleteFolder(userId: string, folderId: string) {
   if (folder.ownerId !== userId) {
     throw new AppError(403, 'FORBIDDEN', 'Only the owner can delete a folder');
   }
+
+  const userIds = await getFolderAccessUserIds(folderId);
 
   // Recursively collect all descendant folder IDs
   const folderIdsToDelete = await collectDescendantFolderIds(folderId);
@@ -127,6 +154,15 @@ export async function deleteFolder(userId: string, folderId: string) {
       where: { id: { in: folderIdsToDelete } },
     }),
   ]);
+
+  broadcastToUsers(
+    userIds,
+    {
+      event: 'folder:deleted',
+      payload: { folderId, deletedFolderIds: folderIdsToDelete },
+    },
+    userId
+  );
 }
 
 async function collectDescendantFolderIds(parentId: string): Promise<string[]> {
@@ -208,6 +244,21 @@ export async function shareFolderWithUser(
     data: { folderId, userId: targetUser.id, permission },
   });
 
+  broadcastToUsers([targetUser.id], {
+    event: 'folder:shared',
+    payload: {
+      folder: {
+        id: folder.id,
+        name: folder.name,
+        parentId: folder.parentId,
+        ownerId: folder.ownerId,
+        createdAt: folder.createdAt,
+        updatedAt: folder.updatedAt,
+        permission,
+      },
+    },
+  });
+
   return {
     userId: targetUser.id,
     email: targetUser.email,
@@ -247,6 +298,21 @@ export async function updateFolderShare(
     },
   });
 
+  broadcastToUsers([updated.userId], {
+    event: 'folder:updated',
+    payload: {
+      folder: {
+        id: folder.id,
+        name: folder.name,
+        parentId: folder.parentId,
+        ownerId: folder.ownerId,
+        createdAt: folder.createdAt,
+        updatedAt: folder.updatedAt,
+        permission: updated.permission,
+      },
+    },
+  });
+
   return {
     userId: updated.userId,
     email: updated.user.email,
@@ -276,4 +342,9 @@ export async function removeFolderShare(
   }
 
   await prisma.folderShare.delete({ where: { id: share.id } });
+
+  broadcastToUsers([targetUserId], {
+    event: 'folder:unshared',
+    payload: { folderId },
+  });
 }

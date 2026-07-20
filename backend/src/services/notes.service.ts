@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma';
 import { AppError } from '../types';
 import { resolveNotePermission, resolveFolderPermission } from './permissions';
+import { broadcastToUsers, getFolderAccessUserIds } from '../websocket/server';
 
 export async function listNotes(userId: string, folderId?: string) {
   // Get owned notes
@@ -126,6 +127,27 @@ export async function createNote(
     },
   });
 
+  if (note.folderId) {
+    const userIds = await getFolderAccessUserIds(note.folderId);
+    broadcastToUsers(
+      userIds,
+      {
+        event: 'note:created',
+        payload: {
+          note: {
+            id: note.id,
+            title: note.title,
+            folderId: note.folderId,
+            ownerId: note.ownerId,
+            createdAt: note.createdAt,
+            updatedAt: note.updatedAt,
+          },
+        },
+      },
+      userId
+    );
+  }
+
   return note;
 }
 
@@ -176,6 +198,34 @@ export async function updateNote(
     },
   });
 
+  const folderIds = Array.from(
+    new Set([updated.folderId, note.folderId].filter(Boolean) as string[])
+  );
+  if (folderIds.length > 0) {
+    const userIdsSet = new Set<string>();
+    for (const fid of folderIds) {
+      const uids = await getFolderAccessUserIds(fid);
+      uids.forEach((u) => userIdsSet.add(u));
+    }
+    broadcastToUsers(
+      Array.from(userIdsSet),
+      {
+        event: 'note:updated_meta',
+        payload: {
+          note: {
+            id: updated.id,
+            title: updated.title,
+            folderId: updated.folderId,
+            ownerId: updated.ownerId,
+            createdAt: updated.createdAt,
+            updatedAt: updated.updatedAt,
+          },
+        },
+      },
+      userId
+    );
+  }
+
   return updated;
 }
 
@@ -189,7 +239,20 @@ export async function deleteNote(userId: string, noteId: string) {
     throw new AppError(403, 'FORBIDDEN', 'Only the owner can delete a note');
   }
 
+  const folderId = note.folderId;
   await prisma.note.delete({ where: { id: noteId } });
+
+  if (folderId) {
+    const userIds = await getFolderAccessUserIds(folderId);
+    broadcastToUsers(
+      userIds,
+      {
+        event: 'note:deleted',
+        payload: { noteId, folderId },
+      },
+      userId
+    );
+  }
 }
 
 // --- Note Sharing ---
@@ -255,6 +318,11 @@ export async function shareNoteWithUser(
     data: { noteId, userId: targetUser.id, permission },
   });
 
+  broadcastToUsers([targetUser.id], {
+    event: 'note:shared',
+    payload: { noteId, permission },
+  });
+
   return {
     userId: targetUser.id,
     email: targetUser.email,
@@ -294,6 +362,11 @@ export async function updateNoteShare(
     },
   });
 
+  broadcastToUsers([updated.userId], {
+    event: 'note:shared',
+    payload: { noteId, permission: updated.permission },
+  });
+
   return {
     userId: updated.userId,
     email: updated.user.email,
@@ -323,4 +396,9 @@ export async function removeNoteShare(
   }
 
   await prisma.noteShare.delete({ where: { id: share.id } });
+
+  broadcastToUsers([targetUserId], {
+    event: 'note:unshared',
+    payload: { noteId },
+  });
 }

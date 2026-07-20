@@ -132,6 +132,53 @@ export function broadcastToRoom(
   }
 }
 
+import { prisma } from '../lib/prisma';
+
+export function broadcastToUsers(
+  userIds: string[],
+  message: object,
+  excludeUserId?: string | null
+) {
+  const data = JSON.stringify(message);
+  for (const uid of userIds) {
+    if (excludeUserId && uid === excludeUserId) continue;
+    const sockets = clients.get(uid);
+    if (!sockets) continue;
+
+    for (const ws of sockets) {
+      if (ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.send(data);
+        } catch {
+          // Dead socket — will be cleaned up on close event
+        }
+      }
+    }
+  }
+}
+
+export async function getFolderAccessUserIds(folderId: string): Promise<string[]> {
+  const userIds = new Set<string>();
+
+  let currentId: string | null = folderId;
+  while (currentId) {
+    const folderData: { ownerId: string; parentId: string | null; shares: { userId: string }[] } | null = await prisma.folder.findUnique({
+      where: { id: currentId },
+      select: { ownerId: true, parentId: true, shares: { select: { userId: true } } },
+    });
+    if (!folderData) break;
+
+    userIds.add(folderData.ownerId);
+    for (const share of folderData.shares) {
+      userIds.add(share.userId);
+    }
+
+    currentId = folderData.parentId;
+  }
+
+  return Array.from(userIds);
+}
+
 export function sendToSocket(ws: WebSocket, message: object) {
   if (ws.readyState === WebSocket.OPEN) {
     try {

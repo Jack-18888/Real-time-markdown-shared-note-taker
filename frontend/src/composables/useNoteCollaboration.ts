@@ -148,8 +148,6 @@ export function useNoteCollaboration(noteId: Ref<string>) {
       clearTimeout(debounceTimer);
       debounceTimer = null;
     }
-
-    disconnect();
   });
 
   return {

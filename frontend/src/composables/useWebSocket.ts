@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue';
+import { ref, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
 type EventHandler = (payload: unknown) => void;
@@ -6,19 +6,25 @@ type EventHandler = (payload: unknown) => void;
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:3000/ws';
 const MAX_RECONNECT_DELAY = 30000;
 
+let ws: WebSocket | null = null;
+const connected = ref(false);
+const handlers = new Map<string, Set<EventHandler>>();
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let reconnectAttempts = 0;
+let shouldReconnect = true;
+
 export function useWebSocket() {
   const authStore = useAuthStore();
-  const connected = ref(false);
-
-  let ws: WebSocket | null = null;
-  let handlers: Map<string, Set<EventHandler>> = new Map();
-  let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  let reconnectAttempts = 0;
-  let shouldReconnect = true;
 
   function connect() {
     const token = authStore.accessToken;
     if (!token) return;
+
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
+    shouldReconnect = true;
 
     try {
       ws = new WebSocket(`${WS_BASE_URL}?token=${token}`);
@@ -35,7 +41,7 @@ export function useWebSocket() {
     ws.onclose = () => {
       connected.value = false;
       ws = null;
-      if (shouldReconnect) {
+      if (shouldReconnect && authStore.isAuthenticated) {
         scheduleReconnect();
       }
     };
@@ -60,7 +66,7 @@ export function useWebSocket() {
   }
 
   function scheduleReconnect() {
-    if (!shouldReconnect) return;
+    if (!shouldReconnect || !authStore.isAuthenticated) return;
     if (reconnectTimer) return;
 
     const delay = Math.min(
@@ -109,18 +115,24 @@ export function useWebSocket() {
       ws = null;
     }
     connected.value = false;
-    handlers.clear();
   }
 
-  // Auto-connect
-  connect();
-
-  onUnmounted(() => {
-    disconnect();
-  });
+  // Auto connect/disconnect based on authentication status
+  watch(
+    () => authStore.isAuthenticated,
+    (isAuth) => {
+      if (isAuth) {
+        connect();
+      } else {
+        disconnect();
+      }
+    },
+    { immediate: true }
+  );
 
   return {
     connected,
+    connect,
     send,
     on,
     off,

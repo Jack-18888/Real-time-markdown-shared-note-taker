@@ -9,6 +9,7 @@ import {
 } from '@/api/notes';
 import type { NoteListItem, Note } from '@/api/notes';
 import { extractErrorMessage, extractErrorStatus } from '@/api/client';
+import { useWebSocket } from '@/composables/useWebSocket';
 
 export const useNotesStore = defineStore('notes', () => {
   const notes = ref<NoteListItem[]>([]);
@@ -16,6 +17,68 @@ export const useNotesStore = defineStore('notes', () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const errorStatus = ref<number | null>(null);
+
+  const ws = useWebSocket();
+
+  ws.on('note:created', (payload) => {
+    const data = payload as { note: NoteListItem };
+    if (data?.note && !notes.value.some((n) => n.id === data.note.id)) {
+      notes.value.push({
+        ...data.note,
+        permission: data.note.permission || 'write',
+      });
+    }
+  });
+
+  ws.on('note:updated_meta', (payload) => {
+    const data = payload as { note: NoteListItem };
+    if (data?.note) {
+      const idx = notes.value.findIndex((n) => n.id === data.note.id);
+      if (idx !== -1) {
+        notes.value[idx] = {
+          ...notes.value[idx],
+          title: data.note.title,
+          folderId: data.note.folderId,
+          updatedAt: data.note.updatedAt,
+        };
+      }
+      if (currentNote.value?.id === data.note.id) {
+        currentNote.value = {
+          ...currentNote.value,
+          title: data.note.title,
+          folderId: data.note.folderId,
+          updatedAt: data.note.updatedAt,
+        };
+      }
+    }
+  });
+
+  ws.on('note:deleted', (payload) => {
+    const data = payload as { noteId: string };
+    if (data?.noteId) {
+      notes.value = notes.value.filter((n) => n.id !== data.noteId);
+      if (currentNote.value?.id === data.noteId) {
+        currentNote.value = null;
+      }
+    }
+  });
+
+  ws.on('note:shared', (payload) => {
+    const data = payload as { noteId: string };
+    if (data?.noteId) {
+      loadNotes();
+    }
+  });
+
+  ws.on('note:unshared', (payload) => {
+    const data = payload as { noteId: string };
+    if (data?.noteId) {
+      notes.value = notes.value.filter((n) => n.id !== data.noteId);
+      if (currentNote.value?.id === data.noteId) {
+        currentNote.value = null;
+      }
+    }
+  });
 
   async function loadNotes(folderId?: string) {
     loading.value = true;

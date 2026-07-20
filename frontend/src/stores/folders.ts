@@ -8,11 +8,55 @@ import {
 } from '@/api/folders';
 import type { Folder } from '@/api/folders';
 import { extractErrorMessage } from '@/api/client';
+import { useWebSocket } from '@/composables/useWebSocket';
 
 export const useFoldersStore = defineStore('folders', () => {
   const folders = ref<Folder[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+
+  const ws = useWebSocket();
+
+  ws.on('folder:created', (payload) => {
+    const data = payload as { folder: Folder };
+    if (data?.folder && !folders.value.some((f) => f.id === data.folder.id)) {
+      folders.value.push(data.folder);
+    }
+  });
+
+  ws.on('folder:updated', (payload) => {
+    const data = payload as { folder: Folder };
+    if (data?.folder) {
+      const idx = folders.value.findIndex((f) => f.id === data.folder.id);
+      if (idx !== -1) {
+        folders.value[idx] = { ...folders.value[idx], ...data.folder };
+      } else {
+        folders.value.push(data.folder);
+      }
+    }
+  });
+
+  ws.on('folder:deleted', (payload) => {
+    const data = payload as { folderId: string; deletedFolderIds?: string[] };
+    if (data) {
+      const ids = new Set(data.deletedFolderIds || [data.folderId]);
+      folders.value = folders.value.filter((f) => !ids.has(f.id));
+    }
+  });
+
+  ws.on('folder:shared', (payload) => {
+    const data = payload as { folder: Folder };
+    if (data?.folder && !folders.value.some((f) => f.id === data.folder.id)) {
+      folders.value.push(data.folder);
+    }
+  });
+
+  ws.on('folder:unshared', (payload) => {
+    const data = payload as { folderId: string };
+    if (data?.folderId) {
+      folders.value = folders.value.filter((f) => f.id !== data.folderId);
+    }
+  });
 
   const rootFolders = computed(() =>
     folders.value.filter((f) => f.parentId === null)
