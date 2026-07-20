@@ -1,6 +1,10 @@
 node_modules/
 dist/
+.vscode
 .env
 *.db
 *.db-journal
+tasks.json
+task.json
+task.md
 creds
