@@ -7,6 +7,10 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
+# Pass DATABASE_URL build argument for Prisma Client generation
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 # Copy Prisma schema and generate client
 COPY prisma ./prisma
 COPY prisma.config.ts ./
