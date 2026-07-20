@@ -11,11 +11,33 @@ import { setupInterceptors } from '@/api/client';
 
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
+function parseJwtPayload(token: string): { sub?: string; email?: string } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4 !== 0) {
+      base64 += '=';
+    }
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<AuthUser | null>(null);
   const accessToken = ref<string | null>(null);
   const refreshTokenValue = ref<string | null>(null);
   const initializing = ref(false);
+  const isInitialized = ref(false);
+  let initPromise: Promise<void> | null = null;
 
   const isAuthenticated = computed(
     () => user.value !== null && accessToken.value !== null
@@ -67,6 +89,10 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const data = await refreshTokenApi(token);
       setTokens(data.accessToken, data.refreshToken);
+      const payload = parseJwtPayload(data.accessToken);
+      if (payload?.sub && payload?.email) {
+        user.value = { id: payload.sub, email: payload.email };
+      }
       return true;
     } catch {
       clearState();
@@ -75,25 +101,38 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function initialize(): Promise<void> {
-    const token = localStorage.getItem(REFRESH_TOKEN_KEY);
-    if (!token) return;
+    if (isInitialized.value) return;
+    if (initPromise) return initPromise;
 
-    initializing.value = true;
-    refreshTokenValue.value = token;
+    initPromise = (async () => {
+      const token = localStorage.getItem(REFRESH_TOKEN_KEY);
+      if (!token) {
+        isInitialized.value = true;
+        return;
+      }
 
-    try {
-      const data = await refreshTokenApi(token);
-      user.value = { id: '', email: '' };
-      setTokens(data.accessToken, data.refreshToken);
+      initializing.value = true;
+      refreshTokenValue.value = token;
 
-      // Decode the access token to extract user info
-      const payload = JSON.parse(atob(data.accessToken.split('.')[1]));
-      user.value = { id: payload.sub, email: payload.email };
-    } catch {
-      clearState();
-    } finally {
-      initializing.value = false;
-    }
+      try {
+        const data = await refreshTokenApi(token);
+        setTokens(data.accessToken, data.refreshToken);
+
+        const payload = parseJwtPayload(data.accessToken);
+        if (payload?.sub && payload?.email) {
+          user.value = { id: payload.sub, email: payload.email };
+        } else {
+          clearState();
+        }
+      } catch {
+        clearState();
+      } finally {
+        initializing.value = false;
+        isInitialized.value = true;
+      }
+    })();
+
+    return initPromise;
   }
 
   // Set up Axios interceptors
@@ -110,6 +149,7 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken,
     refreshTokenValue,
     initializing,
+    isInitialized,
     isAuthenticated,
     login,
     register,
