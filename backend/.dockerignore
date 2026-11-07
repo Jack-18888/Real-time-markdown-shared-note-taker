@@ -7,3 +7,6 @@ dist/
 .git
 .gitignore
 README.md
+
+*.db-wal
+*.db-shm

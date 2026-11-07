@@ -10,7 +10,7 @@ A collaborative markdown note-taking app with real-time co-editing, file/folder 
 |-----------|-------------------------------------|
 | Frontend  | Vue.js 3 (Composition API)          |
 | Backend   | Node.js + Express                   |
-| Database  | PostgreSQL (via Prisma ORM)          |
+| Database  | SQLite (via Prisma ORM)          |
 | Auth      | JWT (access + refresh token pair)   |
 | Real-time | WebSockets (ws library)             |
 
@@ -71,7 +71,6 @@ Before making changes, read the relevant doc files:
 # Backend
 cd backend
 npm install
-npx prisma migrate dev
 npm run dev        # starts on port 3000
 
 # Frontend
@@ -84,7 +83,7 @@ npm run dev        # starts on port 5173
 
 ```bash
 cd backend
-docker compose up     # starts PostgreSQL + backend on port 3000
+docker compose up     # starts backend with persistent SQLite storage on port 3000
 ```
 
 ---
@@ -94,7 +93,7 @@ docker compose up     # starts PostgreSQL + backend on port 3000
 Backend uses a `.env` file at `backend/.env`. Never commit this file.
 
 ```
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+DATABASE_URL="file:./prisma/dev.db"
 JWT_ACCESS_SECRET=
 JWT_REFRESH_SECRET=
 JWT_ACCESS_EXPIRES_IN=

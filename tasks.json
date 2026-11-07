@@ -1,0 +1,17 @@
+[
+  {
+    "id": "sqlite-migration",
+    "description": "Switch backend schema, migrations, runtime adapter and configuration from PostgreSQL to SQLite",
+    "completed": true,
+    "completedAt": "2026-11-07T19:00:41.519Z",
+    "relatedCommit": "HEAD"
+  },
+  {
+    "id": "backend-dev-setup",
+    "description": "Initialize Prisma and environment automatically and verify npm run dev",
+    "completed": false,
+    "completedAt": null,
+    "relatedCommit": null,
+    "blockedReason": "Sandbox blocks npm registry access; SQLite runtime adapter cannot be installed and startup/tests remain unverified."
+  }
+]

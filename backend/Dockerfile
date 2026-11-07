@@ -1,45 +1,22 @@
-# Build stage
-FROM node:20-alpine AS builder
-
+FROM node:24-bookworm-slim AS builder
 WORKDIR /app
-
-# Copy package files and install dependencies
-COPY package.json package-lock.json* ./
-RUN npm ci
-
-# Pass DATABASE_URL build argument for Prisma Client generation
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
-# Copy Prisma schema and generate client
+RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
+COPY package.json package-lock.json ./
+RUN npm install
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 RUN npx prisma generate
-
-# Copy source and build
 COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine
-
+FROM node:24-bookworm-slim
 WORKDIR /app
-
-# Copy package files and install production dependencies only
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
-
-# Copy Prisma schema, config, and generated client from builder
-COPY prisma ./prisma
-COPY prisma.config.ts ./
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
-# Copy compiled output
+RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
+# Keep the Prisma CLI available for deploying migrations on startup.
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/dist ./dist
-
 EXPOSE 3000
-
-# Run migrations and start the app
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/index.js"]

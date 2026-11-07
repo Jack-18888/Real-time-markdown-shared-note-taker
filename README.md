@@ -16,7 +16,7 @@ A collaborative markdown note-taking application with real-time co-editing, hier
 |-----------|-----------------------------------|
 | Frontend  | Vue.js 3 (Composition API), Pinia, Vue Router, Axios |
 | Backend   | Node.js, Express, TypeScript      |
-| Database  | PostgreSQL via Prisma ORM           |
+| Database  | SQLite via Prisma ORM           |
 | Auth      | JWT (access + refresh tokens)     |
 | Real-time | WebSockets (`ws` library)         |
 
@@ -24,23 +24,24 @@ A collaborative markdown note-taking application with real-time co-editing, hier
 
 ### Prerequisites
 
-- Node.js (v18+)
+- Node.js (v24+)
 - npm
-- PostgreSQL (v14+ running locally, or use Docker)
+- SQLite is stored locally; no database server is required.
 
 ### Backend
 
 ```bash
 cd backend
 npm install
-npx prisma migrate dev
 npm run dev        # starts on http://localhost:3000
 ```
 
-Create a `backend/.env` file with:
+`npm run dev` creates `backend/.env` with random JWT secrets when missing, generates Prisma Client, and applies SQLite migrations before starting. Existing `.env` files are preserved; set `DATABASE_URL` to the SQLite URL below. Relative paths are resolved from `backend/`.
+
+Example configuration:
 
 ```
-DATABASE_URL="postgresql://myuser:mypostgrespassword@localhost:5432/mydatabase"
+DATABASE_URL="file:./prisma/dev.db"
 JWT_ACCESS_SECRET=<random-64-char-secret>
 JWT_REFRESH_SECRET=<different-random-64-char-secret>
 JWT_ACCESS_EXPIRES_IN=15m
@@ -53,7 +54,7 @@ CLIENT_ORIGIN=http://localhost:5173
 
 ```bash
 cd backend
-docker compose up     # starts PostgreSQL + backend on port 3000
+docker compose up     # starts backend with persistent SQLite storage on port 3000
 ```
 
 ### Frontend
@@ -96,3 +97,9 @@ npm run dev        # starts on http://localhost:5173
 - **Token lifecycle** — Short-lived access tokens (15m) validated by signature only; long-lived refresh tokens (7d) stored server-side with rotation on each refresh
 - **WebSocket rooms** — Users join note-specific rooms for real-time updates; presence tracking is kept in memory
 - **Graceful degradation** — If the WebSocket connection drops, edits continue saving via REST API
+
+SQLite uses a new database; existing PostgreSQL records are not copied automatically.
+
+Run backend integration tests with `npm test` (uses a separate `prisma/test.db`).
+
+The original PostgreSQL migration is archived in `backend/prisma/postgresql-migrations/`; active migrations target SQLite only.
